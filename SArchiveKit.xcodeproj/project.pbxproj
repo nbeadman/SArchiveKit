@@ -559,36 +559,6 @@
 			};
 			name = Release;
 		};
-		1B21339F0ECCB93D0069C59E /* Release 64Bits */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_PREFIX_HEADER = "";
-				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				INSTALL_PATH = /usr/local/lib;
-				PRODUCT_NAME = sxar;
-			};
-			name = "Release 64Bits";
-		};
-		1B7CF7A00D3577D90068DAD1 /* Release 64Bits */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release 64Bits";
-		};
-		1B7CF7A20D3577D90068DAD1 /* Release 64Bits */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 10;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../Frameworks";
-				PRODUCT_NAME = SArchiveKit;
-				WRAPPER_EXTENSION = framework;
-			};
-			name = "Release 64Bits";
-		};
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -639,7 +609,6 @@
 			buildConfigurations = (
 				1B21339C0ECCB93D0069C59E /* Debug */,
 				1B21339E0ECCB93D0069C59E /* Release */,
-				1B21339F0ECCB93D0069C59E /* Release 64Bits */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -649,7 +618,6 @@
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				1DEB91AF08733DA50010E9CD /* Release */,
-				1B7CF7A20D3577D90068DAD1 /* Release 64Bits */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -659,7 +627,6 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
-				1B7CF7A00D3577D90068DAD1 /* Release 64Bits */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

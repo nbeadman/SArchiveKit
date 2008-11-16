@@ -1,0 +1,51 @@
+Index: filetree.c
+===================================================================
+--- filetree.c	(revision 222)
++++ filetree.c	(working copy)
+@@ -910,6 +910,9 @@
+ 	return NULL;
+ }
+ 
++xar_file_t xar_file_get_parent(xar_file_t file) {
++  return file->parent;
++}
+ 
+ /* xar_prop_serialize
+  * p: property to serialize
+Index: filetree.h
+===================================================================
+--- filetree.h	(revision 222)
++++ filetree.h	(working copy)
+@@ -96,6 +96,7 @@
+ void xar_file_serialize(xar_file_t f, xmlTextWriterPtr writer);
+ xar_file_t xar_file_unserialize(xar_t x, xar_file_t parent, xmlTextReaderPtr reader);
+ xar_file_t xar_file_find(xar_file_t f, const char *path);
++xar_file_t xar_file_get_parent(xar_file_t file);
+ xar_file_t xar_file_new(xar_file_t f);
+ xar_file_t xar_file_replicate(xar_file_t original, xar_file_t newparent);
+ void xar_file_free(xar_file_t f);
+Index: bzxar.c
+===================================================================
+--- bzxar.c	(revision 222)
++++ bzxar.c	(working copy)
+@@ -51,6 +51,7 @@
+ #include "xar.h"
+ #include "filetree.h"
+ #include "io.h"
++#include "bzxar.h"
+ 
+ #ifdef HAVE_LIBBZ2
+ 
+Index: archive.c
+===================================================================
+--- archive.c	(revision 222)
++++ archive.c	(working copy)
+@@ -1026,7 +1026,7 @@
+ * using the filesystem.
+ */
+ 
+-xar_file_t xar_add_frombuffer(xar_t x, xar_file_t parent, const char *name, char *buffer, size_t length) {
++xar_file_t xar_add_frombuffer(xar_t x, xar_file_t parent, const char *name, const char *buffer, size_t length) {
+ 	xar_file_t ret;
+ 	char idstr[32];
+ 	

@@ -13,7 +13,7 @@ NSString * const kSArchiveSignatureSHA1WithRSA;
 
 WB_CLASS_EXPORT
 @interface SArchiveSignature : NSObject {
-  @private
+@private
   void *sa_ptr;
   void *sa_arch;
   

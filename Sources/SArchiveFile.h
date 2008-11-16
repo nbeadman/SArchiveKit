@@ -22,7 +22,7 @@ enum {
 
 WB_CLASS_EXPORT
 @interface SArchiveFile : NSObject {
-  @private
+@private
   void *sa_ptr;
   void *sa_arch;
   NSString *sa_name;
@@ -53,11 +53,11 @@ WB_CLASS_EXPORT
 - (NSFileWrapper *)fileWrapper;
 - (SArchiveFile *)fileWithName:(NSString *)name;
 
-  /* Properties */
+/* Properties */
 - (NSString *)valueForProperty:(NSString *)prop;
 - (void)setValue:(NSString *)value forProperty:(NSString *)prop;
 
-  /* Attributes */
+/* Attributes */
 - (NSString *)valueForAttribute:(NSString *)attr property:(NSString *)prop;
 - (void)setValue:(NSString *)value forAttribute:(NSString *)attr property:(NSString *)property;
 

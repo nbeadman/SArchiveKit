@@ -5,7 +5,9 @@
  *  Created by Jean-Daniel Dupas.
  *  Copyright (c) 2008 Jean-Daniel Dupas. All rights reserved.
  */
-
+/*! \file SArchive.h
+ 
+ */
 #include <Security/Security.h>
 
 /* setting owner/group behavior */
@@ -40,8 +42,8 @@ WB_EXPORT NSString * const SArchiveOptionExcludedProperty;
 @class SArchiveFile, SArchiveDocument;
 WB_CLASS_EXPORT
 @interface SArchive : NSObject {
-  @private
-  void *sa_arch;
+@private
+  void *sa_arch; // xar_t
   NSString *sa_path;
   NSMapTable *sa_files;
   NSMutableArray *sa_roots;
@@ -53,7 +55,8 @@ WB_CLASS_EXPORT
   int32_t sa_extract; /* atomic lock */
   struct _sa_arFlags {
     unsigned int ok:1;
-    unsigned int cancel:1;
+    // volatile to prevent aggressive optimization.
+    volatile unsigned int cancel:1;
     unsigned int reserved:30;
   } sa_arFlags;
 }
@@ -70,7 +73,7 @@ WB_CLASS_EXPORT
 - (NSUInteger)fileCount;
 
 /*!
-  @method
+ @method
  @discussion Files are not sorted in any way.
  */
 - (NSEnumerator *)fileEnumerator;
@@ -104,13 +107,13 @@ WB_CLASS_EXPORT
 - (SArchiveSignature *)addSignature:(SecIdentityRef)identity;
 - (SArchiveSignature *)addSignature:(SecIdentityRef)identity includeCertificate:(BOOL)include;
 
-  /*!
-  @method
-   @param handler should implements 
-   <code>- (void)archive:(SArchive *)manager willProcessFile:(SArchiveFile *)path</code> and
-   <code>- (BOOL)archive:(SArchive *)manager shouldProceedAfterError:(NSError *)anError severity:(SArchiveErrorLevel)severity</code>.
-   keys: @"ArchiveFile".
-   */
+/*!
+ @method
+ @param handler should implements 
+ <code>- (void)archive:(SArchive *)manager willProcessFile:(SArchiveFile *)path</code> and
+ <code>- (BOOL)archive:(SArchive *)manager shouldProceedAfterError:(NSError *)anError severity:(SArchiveErrorLevel)severity</code>.
+ keys: @"ArchiveFile".
+ */
 - (BOOL)extractToPath:(NSString *)path handler:(id)handler;
 
 /* cancel background extraction */

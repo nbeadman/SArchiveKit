@@ -11,7 +11,7 @@
 #import "SArchiveXar.h"
 
 @interface _SArchiveFileDeepEnumerator : NSEnumerator {
-  @protected
+@protected
   SArchiveFile *sa_root;
   SArchiveFile *sa_node;
 }
@@ -198,7 +198,7 @@
   return nil;
 }
 
-  /* Properties */
+/* Properties */
 - (NSString *)valueForProperty:(NSString *)prop {
   return SArchiveXarFileGetProperty(sa_file, prop);
 }

@@ -181,7 +181,8 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
 }
 
 #pragma mark -
-#pragma mark ShadowKit
+#pragma mark CSSM Functions
+// Copied from WonderBox
 static
 OSStatus WBSecurityCreateSignatureContext(SecKeyRef privKey, SecCredentialType credentials, CSSM_CC_HANDLE *ccHandle) {
   OSStatus err = noErr;
@@ -202,7 +203,7 @@ OSStatus WBSecurityCreateSignatureContext(SecKeyRef privKey, SecCredentialType c
   require_noerr(err, bail);
   
 bail:
-    return err;
+  return err;
 }
 static
 OSStatus WBSecurityCreateVerifyContext(SecKeyRef pubKey, CSSM_CC_HANDLE *ccHandle) {
@@ -221,7 +222,7 @@ OSStatus WBSecurityCreateVerifyContext(SecKeyRef pubKey, CSSM_CC_HANDLE *ccHandl
   require_noerr(err, bail);
   
 bail:
-    return err;
+  return err;
 }
 
 static
@@ -235,8 +236,8 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
   require_noerr(err, bail);
   
 bail:
-    /* cleanup */
-    if (ccHandle) CSSM_DeleteContext(ccHandle);
+  /* cleanup */
+  if (ccHandle) CSSM_DeleteContext(ccHandle);
   
   return err;
 }
@@ -261,8 +262,8 @@ OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, co
   require_noerr(err, bail);
   
 bail:
-    /* cleanup */
-    if (ccHandle) CSSM_DeleteContext(ccHandle);
+  /* cleanup */
+  if (ccHandle) CSSM_DeleteContext(ccHandle);
   
   return err;
 }

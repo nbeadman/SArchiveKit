@@ -43,6 +43,7 @@ NSString * const SArchiveOptionCompressionKey = @XAR_OPT_COMPRESSION;
 
 NSString * const SArchiveOptionCompressionGZip = @XAR_OPT_VAL_GZIP;
 NSString * const SArchiveOptionCompressionBZip = @XAR_OPT_VAL_BZIP;
+NSString * const SArchiveOptionCompressionLZMA = @XAR_OPT_VAL_LZMA;
 
 /* include - exclude */
 NSString * const SArchiveOptionIncludedProperty = @XAR_OPT_PROPINCLUDE;
@@ -209,6 +210,11 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   return nil;
 }
 
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len {
+  [self loadTOC];
+  return [sa_files countByEnumeratingWithState:state objects:stackbuf count:len];
+}
+
 #pragma mark Options
 - (void)includeProperty:(NSString *)name {
   [self setValue:name forOption:SArchiveOptionIncludedProperty];
@@ -332,7 +338,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   } else if ([aWrapper isRegularFile]) {
     file = [self addFile:name data:[aWrapper regularFileContents] parent:parent];
   } else if ([aWrapper isSymbolicLink]) {
-		WBThrowException(NSInvalidArgumentException, @"%@ does not currently support symlink", NSStringFromSelector(_cmd));
+		WBThrowException(NSInvalidArgumentException, @"%s does not currently support symlink", __func__);
   } else {
 		WBThrowException(NSInvalidArgumentException, @"unsupported wrapper type");
   }

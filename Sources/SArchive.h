@@ -34,6 +34,7 @@ WB_EXPORT NSString * const SArchiveOptionCompressionKey;
 
 WB_EXPORT NSString * const SArchiveOptionCompressionGZip;
 WB_EXPORT NSString * const SArchiveOptionCompressionBZip;
+WB_EXPORT NSString * const SArchiveOptionCompressionLZMA;
 
 WB_EXPORT NSString * const SArchiveOptionIncludedProperty;
 WB_EXPORT NSString * const SArchiveOptionExcludedProperty;
@@ -41,7 +42,7 @@ WB_EXPORT NSString * const SArchiveOptionExcludedProperty;
 @class SArchiveSignature;
 @class SArchiveFile, SArchiveDocument;
 WB_CLASS_EXPORT
-@interface SArchive : NSObject {
+@interface SArchive : NSObject <NSFastEnumeration> {
 @private
   void *sa_arch; // xar_t
   NSString *sa_path;
@@ -74,7 +75,8 @@ WB_CLASS_EXPORT
 
 /*!
  @method
- @discussion Files are not sorted in any way.
+ @discussion Files are not sorted in any way. 
+ 						You should use Obj-C 2 "fast enumeration" instead of this when possible.
  */
 - (NSEnumerator *)fileEnumerator;
 

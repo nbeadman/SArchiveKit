@@ -147,17 +147,17 @@
 		1BF4AA9D0CBE109B00A7A6FD /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* SArchiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SArchiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		98F6813C0CBECAE700813672 /* SArchiveSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SArchiveSignature.m; sourceTree = "<group>"; };
+		98F6813C0CBECAE700813672 /* SArchiveSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveSignature.m; sourceTree = "<group>"; };
 		98F6821E0CBEDA1A00813672 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
-		98F683430CBEE67E00813672 /* SArchiveSignature.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SArchiveSignature.h; sourceTree = "<group>"; };
-		98F683450CBEE67F00813672 /* SArchive.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SArchive.m; sourceTree = "<group>"; };
-		98F683460CBEE67F00813672 /* SArchiveDocument.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SArchiveDocument.h; sourceTree = "<group>"; };
-		98F683470CBEE67F00813672 /* SArchiveDocument.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SArchiveDocument.m; sourceTree = "<group>"; };
-		98F683480CBEE67F00813672 /* SArchiveFile.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SArchiveFile.m; sourceTree = "<group>"; };
-		98F683490CBEE67F00813672 /* SArchiveXar.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SArchiveXar.m; sourceTree = "<group>"; };
-		98F6834A0CBEE67F00813672 /* SArchive.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SArchive.h; sourceTree = "<group>"; };
-		98F6834B0CBEE67F00813672 /* SArchiveFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SArchiveFile.h; sourceTree = "<group>"; };
-		98F6834C0CBEE67F00813672 /* SArchiveXar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SArchiveXar.h; sourceTree = "<group>"; };
+		98F683430CBEE67E00813672 /* SArchiveSignature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveSignature.h; sourceTree = "<group>"; };
+		98F683450CBEE67F00813672 /* SArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchive.m; sourceTree = "<group>"; };
+		98F683460CBEE67F00813672 /* SArchiveDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveDocument.h; sourceTree = "<group>"; };
+		98F683470CBEE67F00813672 /* SArchiveDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveDocument.m; sourceTree = "<group>"; };
+		98F683480CBEE67F00813672 /* SArchiveFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveFile.m; sourceTree = "<group>"; };
+		98F683490CBEE67F00813672 /* SArchiveXar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveXar.m; sourceTree = "<group>"; };
+		98F6834A0CBEE67F00813672 /* SArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchive.h; sourceTree = "<group>"; };
+		98F6834B0CBEE67F00813672 /* SArchiveFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveFile.h; sourceTree = "<group>"; };
+		98F6834C0CBEE67F00813672 /* SArchiveXar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveXar.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

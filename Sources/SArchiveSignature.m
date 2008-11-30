@@ -183,6 +183,7 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
 #pragma mark -
 #pragma mark CSSM Functions
 // Copied from WonderBox
+#pragma mark Sign
 static
 OSStatus WBSecurityCreateSignatureContext(SecKeyRef privKey, SecCredentialType credentials, CSSM_CC_HANDLE *ccHandle) {
   OSStatus err = noErr;
@@ -206,6 +207,24 @@ bail:
   return err;
 }
 static
+OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, const CSSM_DATA *digest, CSSM_DATA *signature) {
+  OSStatus err = noErr;
+  CSSM_CC_HANDLE ccHandle = 0;
+  
+  err = WBSecurityCreateSignatureContext(privKey, credentials, &ccHandle);
+  require_noerr(err, bail);
+  err = CSSM_SignData(ccHandle, digest, 1, CSSM_ALGID_NONE, signature);
+  require_noerr(err, bail);
+  
+bail:
+  /* cleanup */
+  if (ccHandle) CSSM_DeleteContext(ccHandle);
+  
+  return err;
+}
+
+#pragma mark Verify
+static
 OSStatus WBSecurityCreateVerifyContext(SecKeyRef pubKey, CSSM_CC_HANDLE *ccHandle) {
   OSStatus err = noErr;
   CSSM_CSP_HANDLE cspHandle = 0;
@@ -224,24 +243,6 @@ OSStatus WBSecurityCreateVerifyContext(SecKeyRef pubKey, CSSM_CC_HANDLE *ccHandl
 bail:
   return err;
 }
-
-static
-OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, const CSSM_DATA *digest, CSSM_DATA *signature) {
-  OSStatus err = noErr;
-  CSSM_CC_HANDLE ccHandle = 0;
-  
-  err = WBSecurityCreateSignatureContext(privKey, credentials, &ccHandle);
-  require_noerr(err, bail);
-  err = CSSM_SignData(ccHandle, digest, 1, CSSM_ALGID_NONE, signature);
-  require_noerr(err, bail);
-  
-bail:
-  /* cleanup */
-  if (ccHandle) CSSM_DeleteContext(ccHandle);
-  
-  return err;
-}
-
 static
 OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, const CSSM_DATA *signature, Boolean *valid) {
   OSStatus err = noErr;

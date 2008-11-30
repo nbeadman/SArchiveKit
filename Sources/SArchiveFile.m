@@ -336,7 +336,7 @@ SArchiveFile *__WBNextFile(SArchiveFile *file) {
     [sa_root release];
     sa_root = nil;
   }
-  /* On descend d'un niveau */
+  /* Go one level deeper */
   if ([sa_node count] == 0) {
     /* Si on ne peut pas descendre on se deplace lateralement */
     SArchiveFile *sibling = nil;

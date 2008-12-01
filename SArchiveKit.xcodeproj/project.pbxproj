@@ -543,9 +543,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREFIX_HEADER = "";
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = NO;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = sxar;
+				WB_GENERAL_WARNING_CFLAGS = "-Wmost -Wfloat-equal -Wwrite-strings -Wmissing-field-initializers";
 			};
 			name = Debug;
 		};
@@ -553,9 +557,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREFIX_HEADER = "";
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = NO;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = sxar;
+				WB_GENERAL_WARNING_CFLAGS = "-Wmost -Wfloat-equal -Wwrite-strings -Wmissing-field-initializers";
 			};
 			name = Release;
 		};

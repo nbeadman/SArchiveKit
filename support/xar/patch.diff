@@ -40,7 +40,60 @@ Index: archive.c
 ===================================================================
 --- archive.c	(revision 222)
 +++ archive.c	(working copy)
-@@ -1026,7 +1026,7 @@
+@@ -91,7 +91,7 @@
+  * Summary: just does basicallocation and initialization of 
+  * xar_t structure.
+  */
+-static xar_t xar_new() {
++static xar_t xar_new(void) {
+ 	xar_t ret;
+ 	ret = malloc(sizeof(struct __xar_t));
+ 	if(!ret) return NULL;
+@@ -355,7 +355,8 @@
+ 
+ 	/* If we're creating an archive */
+ 	if( XAR(x)->heap_fd != -1 ) {
+-		char *tmpser;
++    char *tmpser2;
++		const char *tmpser;
+ 		void *rbuf, *wbuf = NULL;
+ 		int fd, r, off, wbytes, rbytes;
+ 		long rsize, wsize;
+@@ -367,7 +368,7 @@
+ 		struct tm tmptm;
+ 		time_t t;
+ 
+-		tmpser = (char *)xar_opt_get(x, XAR_OPT_TOCCKSUM);
++		tmpser = xar_opt_get(x, XAR_OPT_TOCCKSUM);
+ 		/* If no checksum type is specified, default to sha1 */
+ 		if( !tmpser ) tmpser = XAR_OPT_VAL_SHA1;
+ 
+@@ -403,15 +404,15 @@
+ 		xar_prop_set(XAR_FILE(x), "creation-time", timestr);
+ 
+ 		/* serialize the toc to a tmp file */
+-		asprintf(&tmpser, "%s/xar.toc.XXXXXX", XAR(x)->dirname);
+-		fd = mkstemp(tmpser);
+-		xar_serialize(x, tmpser);
+-		unlink(tmpser);
+-		free(tmpser);
+-		asprintf(&tmpser, "%s/xar.toc.XXXXXX", XAR(x)->dirname);
+-		tocfd = mkstemp(tmpser);
+-		unlink(tmpser);
+-		free(tmpser);
++		asprintf(&tmpser2, "%s/xar.toc.XXXXXX", XAR(x)->dirname);
++		fd = mkstemp(tmpser2);
++		xar_serialize(x, tmpser2);
++		unlink(tmpser2);
++		free(tmpser2);
++		asprintf(&tmpser2, "%s/xar.toc.XXXXXX", XAR(x)->dirname);
++		tocfd = mkstemp(tmpser2);
++		unlink(tmpser2);
++		free(tmpser2);
+ 		
+ 	
+ 		/* read the toc from the tmp file, compress it, and write it
+@@ -1026,7 +1027,7 @@
  * using the filesystem.
  */
  
@@ -49,3 +102,30 @@ Index: archive.c
  	xar_file_t ret;
  	char idstr[32];
  	
+Index: archive.h
+===================================================================
+--- archive.h	(revision 222)
++++ archive.h	(working copy)
+@@ -75,7 +75,7 @@
+ 	                         * between callbacks. */
+ 	size_t toc_count;       /* current bytes read of the toc */
+ 	z_stream zs;            /* gz state for compressing/decompressing toc */
+-	char *path_prefix;      /* used for distinguishing absolute paths */
++	const char *path_prefix;      /* used for distinguishing absolute paths */
+ 	err_handler ercallback; /* callback for errors/warnings */
+ 	struct errctx errctx;   /* error callback context */
+ 	xar_subdoc_t subdocs;   /* linked list of subdocs */
+Index: macho.c
+===================================================================
+--- macho.c	(revision 222)
++++ macho.c	(working copy)
+@@ -189,7 +189,8 @@
+ 			tmpin += off;
+ 			if( (inlen-off) >= sizeof(struct mach_header) ) {
+ 				const char *cpustr;
+-				char *typestr, *typestr2;
++				const char *typestr;
++        char *typestr2;
+ 				struct mach_header *mh = (struct mach_header *)tmpin;
+ 				switch(mh->magic) {
+ 				case 0xcffaedfe:

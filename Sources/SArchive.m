@@ -503,7 +503,7 @@ NSString * const SArchiveErrorDomain = @"org.shadowlab.sarchive.error";
   NSAssert(file, @"file not found in archive");
   
   NSMutableDictionary *infos = [[NSMutableDictionary alloc] init];
-  [infos setObject:[NSString stringWithCString:str] forKey:NSLocalizedDescriptionKey];
+  [infos setObject:[NSString stringWithUTF8String:str] forKey:NSLocalizedDescriptionKey];
   [infos setObject:WBInteger(err) forKey:NSUnderlyingErrorKey];
   [infos setObject:[file path] forKey:NSFilePathErrorKey];
   [infos setObject:file forKey:@"ArchiveFile"];

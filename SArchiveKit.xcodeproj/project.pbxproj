@@ -56,11 +56,11 @@
 		1B2134090ECCB9E80069C59E /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B2134070ECCB9E80069C59E /* config.h */; };
 		1B21340A0ECCB9E80069C59E /* xar.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B2134080ECCB9E80069C59E /* xar.h */; };
 		1B7FF02A0ECD6AB5000E1245 /* libsxar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B21339B0ECCB93B0069C59E /* libsxar.a */; };
+		1BE2F1A21036031000B63833 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A11036031000B63833 /* libz.dylib */; };
+		1BE2F1A71036032B00B63833 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A61036032B00B63833 /* libxml2.dylib */; };
+		1BE2F1A91036033200B63833 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A81036033200B63833 /* libbz2.dylib */; };
+		1BE2F1AC1036033E00B63833 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1AB1036033E00B63833 /* libcrypto.dylib */; };
 		1BF4AA8C0CBE105500A7A6FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BF4AA8B0CBE105500A7A6FD /* Cocoa.framework */; };
-		1BF4AA950CBE107A00A7A6FD /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BF4AA940CBE107A00A7A6FD /* libcrypto.dylib */; };
-		1BF4AA970CBE108400A7A6FD /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BF4AA960CBE108400A7A6FD /* libbz2.dylib */; };
-		1BF4AA990CBE108C00A7A6FD /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BF4AA980CBE108C00A7A6FD /* libz.dylib */; };
-		1BF4AA9E0CBE109B00A7A6FD /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BF4AA9D0CBE109B00A7A6FD /* libxml2.dylib */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		98F6813E0CBECAE700813672 /* SArchiveSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F6813C0CBECAE700813672 /* SArchiveSignature.m */; };
 		98F6821F0CBEDA1A00813672 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98F6821E0CBEDA1A00813672 /* Security.framework */; };
@@ -140,11 +140,11 @@
 		1B5A2BB00ED07A0F0036568B /* SArchiveKitDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKitDebug.xcconfig; sourceTree = "<group>"; };
 		1B5A2BB10ED07A0F0036568B /* SArchiveKitRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKitRelease.xcconfig; sourceTree = "<group>"; };
 		1B8F56810D68C5B500B1BE97 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1BE2F1A11036031000B63833 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		1BE2F1A61036032B00B63833 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		1BE2F1A81036033200B63833 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
+		1BE2F1AB1036033E00B63833 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		1BF4AA8B0CBE105500A7A6FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		1BF4AA940CBE107A00A7A6FD /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
-		1BF4AA960CBE108400A7A6FD /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = /usr/lib/libbz2.dylib; sourceTree = "<absolute>"; };
-		1BF4AA980CBE108C00A7A6FD /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
-		1BF4AA9D0CBE109B00A7A6FD /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* SArchiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SArchiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F6813C0CBECAE700813672 /* SArchiveSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveSignature.m; sourceTree = "<group>"; };
@@ -174,11 +174,11 @@
 			files = (
 				1BF4AA8C0CBE105500A7A6FD /* Cocoa.framework in Frameworks */,
 				1B7FF02A0ECD6AB5000E1245 /* libsxar.a in Frameworks */,
-				1BF4AA950CBE107A00A7A6FD /* libcrypto.dylib in Frameworks */,
-				1BF4AA970CBE108400A7A6FD /* libbz2.dylib in Frameworks */,
-				1BF4AA990CBE108C00A7A6FD /* libz.dylib in Frameworks */,
-				1BF4AA9E0CBE109B00A7A6FD /* libxml2.dylib in Frameworks */,
 				98F6821F0CBEDA1A00813672 /* Security.framework in Frameworks */,
+				1BE2F1A21036031000B63833 /* libz.dylib in Frameworks */,
+				1BE2F1A71036032B00B63833 /* libxml2.dylib in Frameworks */,
+				1BE2F1A91036033200B63833 /* libbz2.dylib in Frameworks */,
+				1BE2F1AC1036033E00B63833 /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,10 +211,10 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1BF4AA980CBE108C00A7A6FD /* libz.dylib */,
-				1BF4AA960CBE108400A7A6FD /* libbz2.dylib */,
-				1BF4AA9D0CBE109B00A7A6FD /* libxml2.dylib */,
-				1BF4AA940CBE107A00A7A6FD /* libcrypto.dylib */,
+				1BE2F1A11036031000B63833 /* libz.dylib */,
+				1BE2F1A81036033200B63833 /* libbz2.dylib */,
+				1BE2F1A61036032B00B63833 /* libxml2.dylib */,
+				1BE2F1AB1036033E00B63833 /* libcrypto.dylib */,
 				1BF4AA8B0CBE105500A7A6FD /* Cocoa.framework */,
 				98F6821E0CBEDA1A00813672 /* Security.framework */,
 			);

@@ -200,7 +200,7 @@ OSStatus WBSecurityCreateSignatureContext(SecKeyRef privKey, SecCredentialType c
   require_noerr(err, bail);
   
   /* create cssm context */
-  err = CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_SHA1WithRSA, credits, privkey, ccHandle);
+  err = CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_RSA, credits, privkey, ccHandle);
   require_noerr(err, bail);
   
 bail:
@@ -213,7 +213,7 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
   
   err = WBSecurityCreateSignatureContext(privKey, credentials, &ccHandle);
   require_noerr(err, bail);
-  err = CSSM_SignData(ccHandle, digest, 1, CSSM_ALGID_NONE, signature);
+  err = CSSM_SignData(ccHandle, digest, 1, CSSM_ALGID_SHA1, signature);
   require_noerr(err, bail);
   
 bail:
@@ -237,7 +237,7 @@ OSStatus WBSecurityCreateVerifyContext(SecKeyRef pubKey, CSSM_CC_HANDLE *ccHandl
   require_noerr(err, bail);
   
   /* create cssm context */
-  err = CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_SHA1WithRSA, NULL, pubkey, ccHandle);
+  err = CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_RSA, NULL, pubkey, ccHandle);
   require_noerr(err, bail);
   
 bail:
@@ -253,7 +253,7 @@ OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, co
   require_noerr(err, bail);
   
   /* verify data */
-  err = CSSM_VerifyData(ccHandle, digest, 1, CSSM_ALGID_NONE, signature);
+  err = CSSM_VerifyData(ccHandle, digest, 1, CSSM_ALGID_SHA1, signature);
   if (CSSMERR_CSP_VERIFY_FAILED == err) {
     err = noErr;
     *valid = FALSE;

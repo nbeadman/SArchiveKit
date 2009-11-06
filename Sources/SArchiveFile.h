@@ -6,6 +6,8 @@
  *  Copyright (c) 2008 Jean-Daniel Dupas. All rights reserved.
  */
 
+#import <SArchiveKit/SABase.h>
+
 enum {
   kSArchiveTypeUndefined = 0,
   kSArchiveTypeFile,
@@ -20,7 +22,7 @@ enum {
   kSArchiveTypeWithout,
 };
 
-WB_CLASS_EXPORT
+SA_CLASS_EXPORT
 @interface SArchiveFile : NSObject {
 @private
   void *sa_ptr;

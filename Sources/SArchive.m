@@ -88,6 +88,17 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   return self;
 }
 
+- (id)initWithArchiveAtURL:(NSURL *)anURL {
+  return [self initWithArchiveAtURL:anURL write:NO];
+}
+- (id)initWithArchiveAtURL:(NSURL *)anURL write:(BOOL)flag {
+  if (![anURL isFileURL]) {
+    [self release];
+    WBThrowException(NSInvalidArgumentException, @"Unsupported URL scheme");
+  }
+  return [self initWithArchiveAtPath:[anURL path] write:flag];
+}
+
 - (void)dealloc {
   if (sa_arch) {
     [self close];

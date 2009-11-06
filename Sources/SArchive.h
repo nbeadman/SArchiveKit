@@ -9,39 +9,40 @@
  
  */
 #include <Security/Security.h>
+#import <SArchiveKit/SABase.h>
 
 /* setting owner/group behavior */
-WB_EXPORT NSString * const SArchiveOptionOwnershipBehaviourKey;
+SA_EXPORT NSString * const SArchiveOptionOwnershipBehaviourKey;
 /* set owner/group based on names */
-WB_EXPORT NSString * const SArchiveOptionOwnershipSymbolic;
+SA_EXPORT NSString * const SArchiveOptionOwnershipSymbolic;
 /* set owner/group based on uid/gid */
-WB_EXPORT NSString * const SArchiveOptionOwnershipNumeric;
+SA_EXPORT NSString * const SArchiveOptionOwnershipNumeric;
 
 /* Save setuid/setgid bits */
-WB_EXPORT NSString * const SArchiveOptionSaveSUID;
+SA_EXPORT NSString * const SArchiveOptionSaveSUID;
 
 /* set the toc checksum algorithm */
-WB_EXPORT NSString * const SArchiveOptionTocCheckSumKey;
+SA_EXPORT NSString * const SArchiveOptionTocCheckSumKey;
 /* set the file checksum algorithm */
-WB_EXPORT NSString * const SArchiveOptionFileCheckSumKey;
+SA_EXPORT NSString * const SArchiveOptionFileCheckSumKey;
 
-WB_EXPORT NSString * const SArchiveOptionCheckSumNone;
-WB_EXPORT NSString * const SArchiveOptionCheckSHA1;
-WB_EXPORT NSString * const SArchiveOptionCheckMD5;
+SA_EXPORT NSString * const SArchiveOptionCheckSumNone;
+SA_EXPORT NSString * const SArchiveOptionCheckSHA1;
+SA_EXPORT NSString * const SArchiveOptionCheckMD5;
 
 /* set the file compression type */
-WB_EXPORT NSString * const SArchiveOptionCompressionKey;
+SA_EXPORT NSString * const SArchiveOptionCompressionKey;
 
-WB_EXPORT NSString * const SArchiveOptionCompressionGZip;
-WB_EXPORT NSString * const SArchiveOptionCompressionBZip;
-WB_EXPORT NSString * const SArchiveOptionCompressionLZMA;
+SA_EXPORT NSString * const SArchiveOptionCompressionGZip;
+SA_EXPORT NSString * const SArchiveOptionCompressionBZip;
+SA_EXPORT NSString * const SArchiveOptionCompressionLZMA;
 
-WB_EXPORT NSString * const SArchiveOptionIncludedProperty;
-WB_EXPORT NSString * const SArchiveOptionExcludedProperty;
+SA_EXPORT NSString * const SArchiveOptionIncludedProperty;
+SA_EXPORT NSString * const SArchiveOptionExcludedProperty;
 
 @class SArchiveSignature;
 @class SArchiveFile, SArchiveDocument;
-WB_CLASS_EXPORT
+SA_CLASS_EXPORT
 @interface SArchive : NSObject <NSFastEnumeration> {
 @private
   void *sa_arch; // xar_t
@@ -64,6 +65,9 @@ WB_CLASS_EXPORT
 
 - (id)initWithArchiveAtPath:(NSString *)path;
 - (id)initWithArchiveAtPath:(NSString *)path write:(BOOL)write;
+
+- (id)initWithArchiveAtURL:(NSURL *)anURL;
+- (id)initWithArchiveAtURL:(NSURL *)anURL write:(BOOL)write;
 
 - (NSString *)path;
 
@@ -123,7 +127,7 @@ WB_CLASS_EXPORT
 
 @end
 
-WB_EXPORT NSString * const SArchiveErrorDomain;
+SA_EXPORT NSString * const SArchiveErrorDomain;
 
 enum {
 	kSArchiveLevelDebug    = 1,

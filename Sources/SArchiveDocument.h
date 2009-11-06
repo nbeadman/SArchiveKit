@@ -6,7 +6,9 @@
  *  Copyright (c) 2008 Jean-Daniel Dupas. All rights reserved.
  */
 
-WB_CLASS_EXPORT
+#import <SArchiveKit/SABase.h>
+
+SA_CLASS_EXPORT
 @interface SArchiveDocument : NSObject {
 @private
   void *sa_ptr;

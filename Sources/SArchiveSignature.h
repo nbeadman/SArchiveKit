@@ -8,10 +8,12 @@
 
 #import <Security/Security.h>
 
-WB_EXPORT
+#import <SArchiveKit/SABase.h>
+
+SA_EXPORT
 NSString * const kSArchiveSignatureSHA1WithRSA;
 
-WB_CLASS_EXPORT
+SA_CLASS_EXPORT
 @interface SArchiveSignature : NSObject {
 @private
   void *sa_ptr;

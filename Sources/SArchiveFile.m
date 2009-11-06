@@ -42,7 +42,7 @@
   return sa_path;
 }
 - (void)setPath:(NSString *)aPath {
-  WBSetterCopy(&sa_path, aPath);
+  WBSetterCopy(sa_path, aPath);
 }
 
 - (NSInteger)type {
@@ -87,7 +87,7 @@
   return sa_name;
 }
 - (void)setName:(NSString *)aName {
-  WBSetterCopy(&sa_name, aName);
+  WBSetterCopy(sa_name, aName);
 }
 
 - (mode_t)posixPermissions {

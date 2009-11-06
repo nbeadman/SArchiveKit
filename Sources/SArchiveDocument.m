@@ -27,7 +27,7 @@
   return sa_name;
 }
 - (void)setName:(NSString *)aName {
-  WBSetterCopy(&sa_name, aName);
+  WBSetterCopy(sa_name, aName);
 }
 
 /* Properties */

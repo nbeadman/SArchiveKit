@@ -395,6 +395,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1B2133A00ECCB9400069C59E /* Build configuration list for PBXNativeTarget "sxar" */;
 			buildPhases = (
+				1B7A2A1D1258041C00E73B72 /* Checkout */,
 				1BFA95640ECDBB4500CC0D44 /* Patch Xar */,
 				1B2133970ECCB93B0069C59E /* Headers */,
 				1B2133980ECCB93B0069C59E /* Sources */,
@@ -436,7 +437,14 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "SArchiveKit" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* SArchive */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
@@ -460,6 +468,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1B7A2A1D1258041C00E73B72 /* Checkout */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Checkout;
+			outputPaths = (
+				"$(SRCROOT)/xar/archive.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\n# Checkout xar if needed\nif [ ! -f \"${SRCROOT}/xar/archive.h\" ]\nthen\n\tsvn co --force http://xar.googlecode.com/svn/trunk/xar/lib \"${SRCROOT}/xar\"\n\t# Make sure we apply patches\n\trm -f xar/timestamp\nfi";
+		};
 		1BFA95640ECDBB4500CC0D44 /* Patch Xar */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

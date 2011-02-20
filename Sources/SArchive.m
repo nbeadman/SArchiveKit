@@ -288,7 +288,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   num = [props objectForKey:NSFileOwnerAccountID];
   if (num) {
     info.st_uid = (uid_t)[num unsignedLongValue];
-  } else if (str = [props objectForKey:NSFileOwnerAccountName]) {
+  } else if ((str = [props objectForKey:NSFileOwnerAccountName])) {
     struct passwd *pwd = getpwnam([str UTF8String]);
     if (pwd) {
       info.st_uid = pwd->pw_uid;
@@ -299,7 +299,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   num = [props objectForKey:NSFileGroupOwnerAccountID];
   if (num) {
     info.st_gid = (gid_t)[num unsignedLongValue];
-  } else if (str = [props objectForKey:NSFileGroupOwnerAccountName]) {
+  } else if ((str = [props objectForKey:NSFileGroupOwnerAccountName])) {
     struct group *grp = getgrnam([str UTF8String]);
     if (grp) {
       info.st_gid = grp->gr_gid;

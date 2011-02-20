@@ -138,7 +138,6 @@
 		1B2133D10ECCB9470069C59E /* zxar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zxar.h; sourceTree = "<group>"; };
 		1B2134070ECCB9E80069C59E /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		1B2134080ECCB9E80069C59E /* xar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xar.h; sourceTree = "<group>"; };
-		1B5A2BAF0ED07A0F0036568B /* SArchiveKit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKit.xcconfig; sourceTree = "<group>"; };
 		1B5A2BB00ED07A0F0036568B /* SArchiveKitDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKitDebug.xcconfig; sourceTree = "<group>"; };
 		1B5A2BB10ED07A0F0036568B /* SArchiveKitRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKitRelease.xcconfig; sourceTree = "<group>"; };
 		1B8F56810D68C5B500B1BE97 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -331,7 +330,6 @@
 		1B5A2BAE0ED07A0F0036568B /* xcconfigs */ = {
 			isa = PBXGroup;
 			children = (
-				1B5A2BAF0ED07A0F0036568B /* SArchiveKit.xcconfig */,
 				1B5A2BB00ED07A0F0036568B /* SArchiveKitDebug.xcconfig */,
 				1B5A2BB10ED07A0F0036568B /* SArchiveKitRelease.xcconfig */,
 			);
@@ -477,11 +475,11 @@
 			);
 			name = Checkout;
 			outputPaths = (
-				"$(SRCROOT)/xar/archive.h",
+				"$(SRCROOT)/xar/libxar.la.in.in",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\n# Checkout xar if needed\nif [ ! -f \"${SRCROOT}/xar/archive.h\" ]\nthen\n\tsvn co --force http://xar.googlecode.com/svn/trunk/xar/lib \"${SRCROOT}/xar\"\n\t# Make sure we apply patches\n\trm -f xar/timestamp\nfi";
+			shellScript = "\n# Checkout xar if needed\nif [ ! -f \"${SRCROOT}/xar/libxar.la.in.in\" ]\nthen\n\tsvn co --force http://xar.googlecode.com/svn/trunk/xar/lib \"${SRCROOT}/xar\"\n\t# Make sure we apply patches\n\trm -f xar/timestamp\nfi";
 		};
 		1BFA95640ECDBB4500CC0D44 /* Patch Xar */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -496,8 +494,8 @@
 				"$(SRCROOT)/xar/timestamp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/tcsh;
-			shellScript = "patch -d xar/ -N < support/xar/patch.diff\ntouch xar/timestamp";
+			shellPath = /bin/sh;
+			shellScript = "if [ ! -e \"${SRCROOT}/xar/timestamp\" ]\nthen\n  patch -d \"${SRCROOT}/xar/\" -N < \"${SRCROOT}/support/xar/patch.diff\"\n  touch \"${SRCROOT}/xar/timestamp\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

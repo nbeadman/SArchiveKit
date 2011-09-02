@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -56,15 +56,15 @@
 		1B2133FF0ECCB9470069C59E /* zxar.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B2133D10ECCB9470069C59E /* zxar.h */; };
 		1B2134090ECCB9E80069C59E /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B2134070ECCB9E80069C59E /* config.h */; };
 		1B21340A0ECCB9E80069C59E /* xar.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B2134080ECCB9E80069C59E /* xar.h */; };
+		1B35ED2913C0B82E00A8AEA6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B35ED2813C0B82E00A8AEA6 /* Cocoa.framework */; };
+		1B35ED2B13C0B83500A8AEA6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B35ED2A13C0B83500A8AEA6 /* Security.framework */; };
 		1B7FF02A0ECD6AB5000E1245 /* libsxar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B21339B0ECCB93B0069C59E /* libsxar.a */; };
 		1BE2F1A21036031000B63833 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A11036031000B63833 /* libz.dylib */; };
 		1BE2F1A71036032B00B63833 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A61036032B00B63833 /* libxml2.dylib */; };
 		1BE2F1A91036033200B63833 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A81036033200B63833 /* libbz2.dylib */; };
 		1BE2F1AC1036033E00B63833 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1AB1036033E00B63833 /* libcrypto.dylib */; };
-		1BF4AA8C0CBE105500A7A6FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BF4AA8B0CBE105500A7A6FD /* Cocoa.framework */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		98F6813E0CBECAE700813672 /* SArchiveSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F6813C0CBECAE700813672 /* SArchiveSignature.m */; };
-		98F6821F0CBEDA1A00813672 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98F6821E0CBEDA1A00813672 /* Security.framework */; };
 		98F6834D0CBEE67F00813672 /* SArchiveSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F683430CBEE67E00813672 /* SArchiveSignature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		98F6834F0CBEE67F00813672 /* SArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F683450CBEE67F00813672 /* SArchive.m */; };
 		98F683500CBEE67F00813672 /* SArchiveDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F683460CBEE67F00813672 /* SArchiveDocument.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -138,18 +138,18 @@
 		1B2133D10ECCB9470069C59E /* zxar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zxar.h; sourceTree = "<group>"; };
 		1B2134070ECCB9E80069C59E /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		1B2134080ECCB9E80069C59E /* xar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xar.h; sourceTree = "<group>"; };
+		1B35ED2813C0B82E00A8AEA6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		1B35ED2A13C0B83500A8AEA6 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		1B5A2BB00ED07A0F0036568B /* SArchiveKitDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKitDebug.xcconfig; sourceTree = "<group>"; };
 		1B5A2BB10ED07A0F0036568B /* SArchiveKitRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SArchiveKitRelease.xcconfig; sourceTree = "<group>"; };
-		1B8F56810D68C5B500B1BE97 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1B8F56810D68C5B500B1BE97 /* French */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1BE2F1A11036031000B63833 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		1BE2F1A61036032B00B63833 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		1BE2F1A81036033200B63833 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
 		1BE2F1AB1036033E00B63833 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		1BF4AA8B0CBE105500A7A6FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* SArchiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SArchiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F6813C0CBECAE700813672 /* SArchiveSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveSignature.m; sourceTree = "<group>"; };
-		98F6821E0CBEDA1A00813672 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		98F683430CBEE67E00813672 /* SArchiveSignature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveSignature.h; sourceTree = "<group>"; };
 		98F683450CBEE67F00813672 /* SArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchive.m; sourceTree = "<group>"; };
 		98F683460CBEE67F00813672 /* SArchiveDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveDocument.h; sourceTree = "<group>"; };
@@ -173,9 +173,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1BF4AA8C0CBE105500A7A6FD /* Cocoa.framework in Frameworks */,
+				1B35ED2B13C0B83500A8AEA6 /* Security.framework in Frameworks */,
+				1B35ED2913C0B82E00A8AEA6 /* Cocoa.framework in Frameworks */,
 				1B7FF02A0ECD6AB5000E1245 /* libsxar.a in Frameworks */,
-				98F6821F0CBEDA1A00813672 /* Security.framework in Frameworks */,
 				1BE2F1A21036031000B63833 /* libz.dylib in Frameworks */,
 				1BE2F1A71036032B00B63833 /* libxml2.dylib in Frameworks */,
 				1BE2F1A91036033200B63833 /* libbz2.dylib in Frameworks */,
@@ -216,8 +216,8 @@
 				1BE2F1A81036033200B63833 /* libbz2.dylib */,
 				1BE2F1A61036032B00B63833 /* libxml2.dylib */,
 				1BE2F1AB1036033E00B63833 /* libcrypto.dylib */,
-				1BF4AA8B0CBE105500A7A6FD /* Cocoa.framework */,
-				98F6821E0CBEDA1A00813672 /* Security.framework */,
+				1B35ED2813C0B82E00A8AEA6 /* Cocoa.framework */,
+				1B35ED2A13C0B83500A8AEA6 /* Security.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -433,8 +433,11 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0410;
+			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "SArchiveKit" */;
-			compatibilityVersion = "Xcode 3.1";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -573,6 +576,7 @@
 				GCC_WARN_SIGN_COMPARE = NO;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = sxar;
 				WB_GENERAL_WARNING_CFLAGS = "-Wmost -Wfloat-equal -Wwrite-strings -Wmissing-field-initializers";
 			};
@@ -587,6 +591,7 @@
 				GCC_WARN_SIGN_COMPARE = NO;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = sxar;
 				WB_GENERAL_WARNING_CFLAGS = "-Wmost -Wfloat-equal -Wwrite-strings -Wmissing-field-initializers";
 			};

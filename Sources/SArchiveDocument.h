@@ -8,7 +8,7 @@
 
 #import <SArchiveKit/SABase.h>
 
-SA_CLASS_EXPORT
+SARCHIVE_OBJC_EXPORT
 @interface SArchiveDocument : NSObject {
 @private
   void *sa_ptr;

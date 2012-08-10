@@ -10,10 +10,10 @@
 
 #import <SArchiveKit/SABase.h>
 
-SA_EXPORT
+SARCHIVE_EXPORT
 NSString * const kSArchiveSignatureSHA1WithRSA;
 
-SA_CLASS_EXPORT
+SARCHIVE_OBJC_EXPORT
 @interface SArchiveSignature : NSObject {
 @private
   void *sa_ptr;

@@ -22,7 +22,7 @@ enum {
   kSArchiveTypeWithout,
 };
 
-SA_CLASS_EXPORT
+SARCHIVE_OBJC_EXPORT
 @interface SArchiveFile : NSObject {
 @private
   void *sa_ptr;

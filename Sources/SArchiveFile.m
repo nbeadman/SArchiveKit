@@ -317,7 +317,7 @@
   [super dealloc];
 }
 
-SA_INLINE
+SARCHIVE_INLINE
 SArchiveFile *__WBNextFile(SArchiveFile *file) {
   SArchiveFile *parent = [file container];
   if (parent) {

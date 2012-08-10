@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B08803715D579DA006336F8 /* SArchiveDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B08803615D579DA006336F8 /* SArchiveDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1B09B67310612D11000A612C /* SABase.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B09B67210612D11000A612C /* SABase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1B2133D20ECCB9470069C59E /* appledouble.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B2133A20ECCB9470069C59E /* appledouble.h */; };
 		1B2133D30ECCB9470069C59E /* archive.c in Sources */ = {isa = PBXBuildFile; fileRef = 1B2133A30ECCB9470069C59E /* archive.c */; };
@@ -88,6 +89,7 @@
 
 /* Begin PBXFileReference section */
 		089C1667FE841158C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1B08803615D579DA006336F8 /* SArchiveDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SArchiveDefine.h; sourceTree = "<group>"; };
 		1B09B67210612D11000A612C /* SABase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABase.h; sourceTree = "<group>"; };
 		1B21339B0ECCB93B0069C59E /* libsxar.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsxar.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B2133A20ECCB9470069C59E /* appledouble.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = appledouble.h; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 		08FB77AEFE84172EC02AAC07 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				1B08803615D579DA006336F8 /* SArchiveDefine.h */,
 				1B09B67210612D11000A612C /* SABase.h */,
 				98F6834C0CBEE67F00813672 /* SArchiveXar.h */,
 				98F683490CBEE67F00813672 /* SArchiveXar.m */,
@@ -377,12 +380,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98F6834D0CBEE67F00813672 /* SArchiveSignature.h in Headers */,
-				98F683500CBEE67F00813672 /* SArchiveDocument.h in Headers */,
+				1B09B67310612D11000A612C /* SABase.h in Headers */,
 				98F683540CBEE67F00813672 /* SArchive.h in Headers */,
 				98F683550CBEE67F00813672 /* SArchiveFile.h in Headers */,
+				1B08803715D579DA006336F8 /* SArchiveDefine.h in Headers */,
+				98F6834D0CBEE67F00813672 /* SArchiveSignature.h in Headers */,
+				98F683500CBEE67F00813672 /* SArchiveDocument.h in Headers */,
 				98F683560CBEE67F00813672 /* SArchiveXar.h in Headers */,
-				1B09B67310612D11000A612C /* SABase.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

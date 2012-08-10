@@ -12,37 +12,37 @@
 #import <SArchiveKit/SABase.h>
 
 /* setting owner/group behavior */
-SA_EXPORT NSString * const SArchiveOptionOwnershipBehaviourKey;
+SARCHIVE_EXPORT NSString * const SArchiveOptionOwnershipBehaviourKey;
 /* set owner/group based on names */
-SA_EXPORT NSString * const SArchiveOptionOwnershipSymbolic;
+SARCHIVE_EXPORT NSString * const SArchiveOptionOwnershipSymbolic;
 /* set owner/group based on uid/gid */
-SA_EXPORT NSString * const SArchiveOptionOwnershipNumeric;
+SARCHIVE_EXPORT NSString * const SArchiveOptionOwnershipNumeric;
 
 /* Save setuid/setgid bits */
-SA_EXPORT NSString * const SArchiveOptionSaveSUID;
+SARCHIVE_EXPORT NSString * const SArchiveOptionSaveSUID;
 
 /* set the toc checksum algorithm */
-SA_EXPORT NSString * const SArchiveOptionTocCheckSumKey;
+SARCHIVE_EXPORT NSString * const SArchiveOptionTocCheckSumKey;
 /* set the file checksum algorithm */
-SA_EXPORT NSString * const SArchiveOptionFileCheckSumKey;
+SARCHIVE_EXPORT NSString * const SArchiveOptionFileCheckSumKey;
 
-SA_EXPORT NSString * const SArchiveOptionCheckSumNone;
-SA_EXPORT NSString * const SArchiveOptionCheckSHA1;
-SA_EXPORT NSString * const SArchiveOptionCheckMD5;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSumNone;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSHA1;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckMD5;
 
 /* set the file compression type */
-SA_EXPORT NSString * const SArchiveOptionCompressionKey;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionKey;
 
-SA_EXPORT NSString * const SArchiveOptionCompressionGZip;
-SA_EXPORT NSString * const SArchiveOptionCompressionBZip;
-SA_EXPORT NSString * const SArchiveOptionCompressionLZMA;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionGZip;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionBZip;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionLZMA;
 
-SA_EXPORT NSString * const SArchiveOptionIncludedProperty;
-SA_EXPORT NSString * const SArchiveOptionExcludedProperty;
+SARCHIVE_EXPORT NSString * const SArchiveOptionIncludedProperty;
+SARCHIVE_EXPORT NSString * const SArchiveOptionExcludedProperty;
 
 @class SArchiveSignature;
 @class SArchiveFile, SArchiveDocument;
-SA_CLASS_EXPORT
+SARCHIVE_OBJC_EXPORT
 @interface SArchive : NSObject <NSFastEnumeration> {
 @private
   void *sa_arch; // xar_t
@@ -127,7 +127,7 @@ SA_CLASS_EXPORT
 
 @end
 
-SA_EXPORT NSString * const SArchiveErrorDomain;
+SARCHIVE_EXPORT NSString * const SArchiveErrorDomain;
 
 enum {
 	kSArchiveLevelDebug    = 1,

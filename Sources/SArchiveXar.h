@@ -9,27 +9,27 @@
 #include "xar.h"
 #import <SArchiveKit/SABase.h>
 
-SA_PRIVATE
+SARCHIVE_PRIVATE
 xar_file_t xar_file_get_parent(xar_file_t file);
 
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSString *SArchiveXarFileGetProperty(xar_file_t file, NSString *property);
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSInteger SArchiveXarFileSetProperty(xar_file_t file, NSString *property, NSString *value);
 
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSString *SArchiveXarFileGetAttribute(xar_file_t file, NSString *property, NSString *attribute);
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSInteger SArchiveXarFileSetAttribute(xar_file_t file, NSString *property, NSString *attribute, NSString *value);
 
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSString *SArchiveXarSubDocGetProperty(xar_subdoc_t doc, NSString *property);
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSInteger SArchiveXarSubDocSetProperty(xar_subdoc_t doc, NSString *property, NSString *value);
 
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSString *SArchiveXarSubDocGetAttribute(xar_subdoc_t doc, NSString *property, NSString *attribute);
-SA_PRIVATE
+SARCHIVE_PRIVATE
 NSInteger SArchiveXarSubDocSetAttribute(xar_subdoc_t doc, NSString *property, NSString *attribute, NSString *value);
 
 #pragma mark -

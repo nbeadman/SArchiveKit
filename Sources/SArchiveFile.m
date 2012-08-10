@@ -103,7 +103,7 @@
 }
 
 - (void)setPosixPermissions:(mode_t)perm {
-  NSString *str = [[NSString alloc] initWithFormat:@"%.4lo", perm];
+  NSString *str = [[NSString alloc] initWithFormat:@"%.4ho", perm];
   if (str) {
     [self setValue:str forProperty:@"mode"];
     [str release];

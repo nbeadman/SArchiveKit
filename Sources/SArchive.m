@@ -476,7 +476,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 
 - (BOOL)extractToPath:(NSString *)path handler:(id)handler {
   if (!OSAtomicCompareAndSwap32(0, 1, &sa_extract))
-		WBThrowException(NSInternalInconsistencyException, @"%@ is already extracting data");
+		WBThrowException(NSInternalInconsistencyException, @"%@ is already extracting data", self);
   
   /* preload archive (if not already done) */
   [self loadTOC];

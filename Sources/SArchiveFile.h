@@ -34,14 +34,12 @@ SARCHIVE_OBJC_EXPORT
   NSMutableArray *sa_files;
 }
 
-- (NSString *)path;
-- (void)setPath:(NSString *)aPath;
+@property(nonatomic, copy) NSString *path;
 
 - (NSInteger)type;
 - (UInt64)size;
 
-- (NSString *)name;
-- (void)setName:(NSString *)aName;
+@property(nonatomic, copy) NSString *name;
 
 - (mode_t)posixPermissions;
 - (void)setPosixPermissions:(mode_t)perm;

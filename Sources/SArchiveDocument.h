@@ -16,8 +16,7 @@ SARCHIVE_OBJC_EXPORT
   NSString *sa_name;
 }
 
-- (NSString *)name;
-- (void)setName:(NSString *)aName;
+@property(nonatomic, copy) NSString *name;
 
 /* Properties */
 - (NSString *)valueForProperty:(NSString *)prop;

@@ -94,7 +94,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 - (id)initWithArchiveAtURL:(NSURL *)anURL write:(BOOL)flag {
   if (![anURL isFileURL]) {
     [self release];
-    WBThrowException(NSInvalidArgumentException, @"Unsupported URL scheme");
+    SPXThrowException(NSInvalidArgumentException, @"Unsupported URL scheme");
   }
   return [self initWithArchiveAtPath:[anURL path] write:flag];
 }
@@ -336,7 +336,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
     name = [aWrapper preferredFilename];
   }
   if (!name)
-		WBThrowException(NSInvalidArgumentException, @"Invalid file wrapper name.");
+		SPXThrowException(NSInvalidArgumentException, @"Invalid file wrapper name.");
   
   if ([aWrapper isDirectory]) {
     file = [self addFolder:name properties:nil parent:parent];
@@ -349,9 +349,9 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   } else if ([aWrapper isRegularFile]) {
     file = [self addFile:name data:[aWrapper regularFileContents] parent:parent];
   } else if ([aWrapper isSymbolicLink]) {
-		WBThrowException(NSInvalidArgumentException, @"%s does not currently support symlink", __func__);
+		SPXThrowException(NSInvalidArgumentException, @"%s does not currently support symlink", __func__);
   } else {
-		WBThrowException(NSInvalidArgumentException, @"unsupported wrapper type");
+		SPXThrowException(NSInvalidArgumentException, @"unsupported wrapper type");
   }
   if (fsname) {
     [file setValue:@"fsname" forAttribute:@"type" property:@"name"];
@@ -385,7 +385,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 
 - (SArchiveDocument *)addDocumentWithName:(NSString *)name {
   if (!name)
-		WBThrowException(NSInvalidArgumentException, @"name MUST not be nil");
+		SPXThrowException(NSInvalidArgumentException, @"name MUST not be nil");
   xar_subdoc_t doc = xar_subdoc_new(sa_xar, [name UTF8String]);
   if (doc) {
     SArchiveDocument *document = [[SArchiveDocument alloc] initWithArchive:sa_xar document:doc];
@@ -476,7 +476,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 
 - (BOOL)extractToPath:(NSString *)path handler:(id)handler {
   if (!OSAtomicCompareAndSwap32(0, 1, &sa_extract))
-		WBThrowException(NSInternalInconsistencyException, @"%@ is already extracting data", self);
+		SPXThrowException(NSInternalInconsistencyException, @"%@ is already extracting data", self);
   
   /* preload archive (if not already done) */
   [self loadTOC];
@@ -506,7 +506,7 @@ NSString * const SArchiveErrorDomain = @"org.shadowlab.sarchive.error";
   const char *str = xar_err_get_string(errctxt);
   
   if (!f) {
-    DLog(@"Cannot retreive error file");
+    SPXDebug(@"Cannot retreive error file");
     return 0;
   }
   
@@ -515,7 +515,7 @@ NSString * const SArchiveErrorDomain = @"org.shadowlab.sarchive.error";
   
   NSMutableDictionary *infos = [[NSMutableDictionary alloc] init];
   [infos setObject:[NSString stringWithUTF8String:str] forKey:NSLocalizedDescriptionKey];
-  [infos setObject:WBInteger(err) forKey:NSUnderlyingErrorKey];
+  [infos setObject:@(err) forKey:NSUnderlyingErrorKey];
   [infos setObject:[file path] forKey:NSFilePathErrorKey];
   [infos setObject:file forKey:@"ArchiveFile"];
   

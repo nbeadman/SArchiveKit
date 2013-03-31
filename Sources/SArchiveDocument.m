@@ -12,6 +12,8 @@
 
 @implementation SArchiveDocument
 
+@synthesize name = sa_name;
+
 - (void)dealloc {
   [sa_name release];
   [super dealloc];
@@ -25,9 +27,6 @@
       sa_name = [[NSString alloc] initWithUTF8String:name];
   }
   return sa_name;
-}
-- (void)setName:(NSString *)aName {
-  WBSetterCopy(sa_name, aName);
 }
 
 /* Properties */

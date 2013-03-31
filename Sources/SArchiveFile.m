@@ -22,6 +22,9 @@
 
 @implementation SArchiveFile
 
+@synthesize path = sa_path;
+@synthesize name = sa_name;
+
 - (void)dealloc {
   [self removeAllFiles];
   [sa_files release];
@@ -40,9 +43,6 @@
     }
   }
   return sa_path;
-}
-- (void)setPath:(NSString *)aPath {
-  WBSetterCopy(sa_path, aPath);
 }
 
 - (NSInteger)type {
@@ -85,9 +85,6 @@
     sa_name = [[self valueForProperty:@"name"] retain];
   }
   return sa_name;
-}
-- (void)setName:(NSString *)aName {
-  WBSetterCopy(sa_name, aName);
 }
 
 - (mode_t)posixPermissions {
@@ -172,7 +169,7 @@
     }
       break;
     default:
-			WBThrowException(NSInvalidArgumentException, @"cannot create filewrapper with type: %@", [self valueForProperty:@"type"]);
+			SPXThrowException(NSInvalidArgumentException, @"cannot create filewrapper with type: %@", [self valueForProperty:@"type"]);
   }
   /* Restore attributes */
   NSString *nametype = [self valueForAttribute:@"type" property:@"name"];

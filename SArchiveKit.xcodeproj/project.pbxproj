@@ -71,7 +71,7 @@
 		98F683500CBEE67F00813672 /* SArchiveDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F683460CBEE67F00813672 /* SArchiveDocument.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		98F683510CBEE67F00813672 /* SArchiveDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F683470CBEE67F00813672 /* SArchiveDocument.m */; };
 		98F683520CBEE67F00813672 /* SArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F683480CBEE67F00813672 /* SArchiveFile.m */; };
-		98F683530CBEE67F00813672 /* SArchiveXar.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F683490CBEE67F00813672 /* SArchiveXar.m */; };
+		98F683530CBEE67F00813672 /* SArchiveXar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98F683490CBEE67F00813672 /* SArchiveXar.mm */; };
 		98F683540CBEE67F00813672 /* SArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F6834A0CBEE67F00813672 /* SArchive.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		98F683550CBEE67F00813672 /* SArchiveFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F6834B0CBEE67F00813672 /* SArchiveFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		98F683560CBEE67F00813672 /* SArchiveXar.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F6834C0CBEE67F00813672 /* SArchiveXar.h */; };
@@ -148,7 +148,7 @@
 		1B92D0BA170724C800F40FCD /* application.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = application.xcconfig; sourceTree = "<group>"; };
 		1B92D0BB170724C800F40FCD /* archive.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = archive.xcconfig; sourceTree = "<group>"; };
 		1B92D0BC170724C800F40FCD /* bundle.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = bundle.xcconfig; sourceTree = "<group>"; };
-		1B92D0BD170724C800F40FCD /* dylib.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = dylib.xcconfig; sourceTree = "<group>"; };
+		1B92D0BD170724C800F40FCD /* framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = framework.xcconfig; path = ../../hadron/xcconfigs/target/framework.xcconfig; sourceTree = "<group>"; };
 		1B92D0BE170724C800F40FCD /* executable.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = executable.xcconfig; sourceTree = "<group>"; };
 		1BE2F1A11036031000B63833 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		1BE2F1A61036032B00B63833 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
@@ -162,7 +162,7 @@
 		98F683460CBEE67F00813672 /* SArchiveDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveDocument.h; sourceTree = "<group>"; };
 		98F683470CBEE67F00813672 /* SArchiveDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveDocument.m; sourceTree = "<group>"; };
 		98F683480CBEE67F00813672 /* SArchiveFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveFile.m; sourceTree = "<group>"; };
-		98F683490CBEE67F00813672 /* SArchiveXar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SArchiveXar.m; sourceTree = "<group>"; };
+		98F683490CBEE67F00813672 /* SArchiveXar.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = SArchiveXar.mm; sourceTree = "<group>"; };
 		98F6834A0CBEE67F00813672 /* SArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchive.h; sourceTree = "<group>"; };
 		98F6834B0CBEE67F00813672 /* SArchiveFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveFile.h; sourceTree = "<group>"; };
 		98F6834C0CBEE67F00813672 /* SArchiveXar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SArchiveXar.h; sourceTree = "<group>"; };
@@ -244,7 +244,7 @@
 				1B08803615D579DA006336F8 /* SArchiveDefine.h */,
 				1B09B67210612D11000A612C /* SABase.h */,
 				98F6834C0CBEE67F00813672 /* SArchiveXar.h */,
-				98F683490CBEE67F00813672 /* SArchiveXar.m */,
+				98F683490CBEE67F00813672 /* SArchiveXar.mm */,
 				98F6834A0CBEE67F00813672 /* SArchive.h */,
 				98F683450CBEE67F00813672 /* SArchive.m */,
 				98F6834B0CBEE67F00813672 /* SArchiveFile.h */,
@@ -352,7 +352,7 @@
 				1B92D0BA170724C800F40FCD /* application.xcconfig */,
 				1B92D0BB170724C800F40FCD /* archive.xcconfig */,
 				1B92D0BC170724C800F40FCD /* bundle.xcconfig */,
-				1B92D0BD170724C800F40FCD /* dylib.xcconfig */,
+				1B92D0BD170724C800F40FCD /* framework.xcconfig */,
 				1B92D0BE170724C800F40FCD /* executable.xcconfig */,
 			);
 			path = target;
@@ -562,7 +562,7 @@
 				98F6834F0CBEE67F00813672 /* SArchive.m in Sources */,
 				98F683510CBEE67F00813672 /* SArchiveDocument.m in Sources */,
 				98F683520CBEE67F00813672 /* SArchiveFile.m in Sources */,
-				98F683530CBEE67F00813672 /* SArchiveXar.m in Sources */,
+				98F683530CBEE67F00813672 /* SArchiveXar.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,8 +623,9 @@
 		};
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1B92D0BD170724C800F40FCD /* dylib.xcconfig */;
+			baseConfigurationReference = 1B92D0BD170724C800F40FCD /* framework.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CURRENT_PROJECT_VERSION = 10;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -638,8 +639,9 @@
 		};
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1B92D0BD170724C800F40FCD /* dylib.xcconfig */;
+			baseConfigurationReference = 1B92D0BD170724C800F40FCD /* framework.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CURRENT_PROJECT_VERSION = 10;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

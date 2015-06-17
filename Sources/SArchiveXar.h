@@ -6,7 +6,16 @@
  *  Copyright (c) 2008 Jean-Daniel Dupas. All rights reserved.
  */
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "xar.h"
+
+#if defined(__cplusplus)
+}
+#endif
+
 #import <SArchiveKit/SABase.h>
 
 SARCHIVE_PRIVATE
@@ -37,10 +46,17 @@ NSInteger SArchiveXarSubDocSetAttribute(xar_subdoc_t doc, NSString *property, NS
 #import <SArchiveKit/SArchiveDocument.h>
 #import <SArchiveKit/SArchiveSignature.h>
 
-#define sa_xar  (xar_t)sa_arch
-#define sa_file (xar_file_t)sa_ptr
-#define sa_doc  (xar_subdoc_t)sa_ptr
-#define sa_sign (xar_signature_t)sa_ptr
+#if defined(__cplusplus)
+#  define sa_xar  static_cast<xar_t>(sa_arch)
+#  define sa_file static_cast<xar_file_t>(sa_ptr)
+#  define sa_doc  static_cast<xar_subdoc_t>(sa_ptr)
+#  define sa_sign static_cast<xar_signature_t>(sa_ptr)
+#else
+#  define sa_xar  (xar_t)sa_arch
+#  define sa_file (xar_file_t)sa_ptr
+#  define sa_doc  (xar_subdoc_t)sa_ptr
+#  define sa_sign (xar_signature_t)sa_ptr
+#endif
 
 @interface SArchiveFile ()
 

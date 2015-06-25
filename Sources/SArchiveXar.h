@@ -94,13 +94,10 @@ NSInteger SArchiveXarSubDocSetAttribute(xar_subdoc_t doc, NSString *property, NS
 + (SArchiveSignature *)signatureWithIdentity:(SecIdentityRef)identity archive:(xar_t)arch;
 - (id)initWithArchive:(xar_t)arch signature:(xar_signature_t)ptr;
 
-- (xar_t)archive;
-- (void)setArchive:(xar_t)arch;
+@property(nonatomic) xar_t archive;
 
-- (xar_signature_t)signature;
-- (void)setSignature:(xar_signature_t)signature;
+@property(nonatomic) xar_signature_t signature;
 
-- (void)setIndentity:(SecIdentityRef)anIndentity;
 
 @end
 

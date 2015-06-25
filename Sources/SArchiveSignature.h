@@ -14,18 +14,13 @@ SARCHIVE_EXPORT
 NSString * const kSArchiveSignatureSHA1WithRSA;
 
 SARCHIVE_OBJC_EXPORT
-@interface SArchiveSignature : NSObject {
-@private
-  void *sa_ptr;
-  void *sa_arch;
-  
-  SecIdentityRef sa_identity;
-}
+@interface SArchiveSignature : NSObject
 
-- (SecIdentityRef)identity;
+@property(nonatomic, readonly) SecIdentityRef identity;
 
-- (NSArray *)certificates;
-- (OSStatus)addCertificate:(SecCertificateRef)cert;
+@property(nonatomic, readonly) NSArray *certificates;
+
+- (BOOL)addCertificate:(SecCertificateRef)cert;
 
 - (BOOL)verify:(SecCertificateRef)certificate;
 - (OSStatus)getDigest:(NSData **)digest signature:(NSData **)signdata;

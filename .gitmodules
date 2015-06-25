@@ -1,0 +1,4 @@
+[submodule "xar"]
+	path = xar
+	url = ../xar
+	branch = master

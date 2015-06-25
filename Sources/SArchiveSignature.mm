@@ -17,15 +17,16 @@ OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, co
 static
 OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, const CSSM_DATA *digest, CSSM_DATA *signature);
 
-@implementation SArchiveSignature
-
-- (void)dealloc {
-  if (sa_identity) CFRelease(sa_identity);
-  [super dealloc];
+@implementation SArchiveSignature {
+@private
+  void *sa_ptr;
+  void *sa_arch;
 }
 
-- (SecIdentityRef)identity {
-  return sa_identity;
+- (void)dealloc {
+  if (_identity)
+    CFRelease(_identity);
+  [super dealloc];
 }
 
 - (NSString *)type {
@@ -43,27 +44,27 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
     uint32_t datalen = 0;
     const uint8_t *data = NULL;
     if (0 == xar_signature_get_x509certificate_data(sa_sign, idx, &data, &datalen)) {
-      SecCertificateRef cert = NULL;
-      const CSSM_DATA certdata = { datalen, (uint8_t *)data };
-      OSStatus err = SecCertificateCreateFromData(&certdata, CSSM_CERT_X_509v3, CSSM_CERT_ENCODING_BER, &cert);
-      if (noErr == err) {
-        [certs addObject:(id)cert];
-        CFRelease(cert);
+      spx::unique_cfptr<CFDataRef> certdata(CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, data, datalen, kCFAllocatorNull));
+      if (certdata) {
+        spx::unique_cfptr<SecCertificateRef> cert(SecCertificateCreateWithData(kCFAllocatorDefault, certdata.get()));
+        if (cert)
+          [certs addObject:SPXCFToNSType(cert.get())];
       }
     }
   }
   return [certs autorelease];
 }
 
-- (OSStatus)addCertificate:(SecCertificateRef)cert {
-  if (!sa_ptr) return paramErr;
+- (BOOL)addCertificate:(SecCertificateRef)cert {
+  if (!sa_ptr)
+    return NO;
   
-  CSSM_DATA certdata = { 0, NULL };
-  OSStatus err = SecCertificateGetData(cert, &certdata);
-  if (noErr == err) {
-    err = xar_signature_add_x509certificate(sa_sign, certdata.Data, (uint32_t)certdata.Length);
+  spx::unique_cfptr<CFDataRef> certdata(SecCertificateCopyData(cert));
+  if (certdata) {
+    return 0 == xar_signature_add_x509certificate(sa_sign, CFDataGetBytePtr(certdata.get()), (uint32_t)CFDataGetLength(certdata.get()));
+  } else {
+    return NO;
   }
-  return err;
 }
 
 - (BOOL)verify:(SecCertificateRef)certificate {
@@ -88,7 +89,7 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
   
   uint8_t *data = NULL, *signed_data = NULL;
   uint32_t length = 0, signed_length = 0;
-  int err = xar_signature_copy_signed_data(sa_sign, &data, &length, &signed_data, &signed_length);
+  int err = xar_signature_copy_signed_data(sa_sign, &data, &length, &signed_data, &signed_length, NULL);
   if (0 == err) {
     if (digest) *digest = [NSData dataWithBytesNoCopy:data length:length freeWhenDone:YES];
     if (signdata) *signdata = [NSData dataWithBytesNoCopy:signed_data length:signed_length freeWhenDone:YES];
@@ -103,21 +104,18 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
 
 + (SArchiveSignature *)signatureWithIdentity:(SecIdentityRef)identity archive:(xar_t)arch {
   SecKeyRef pkey = NULL;
-  uint32_t signlen = 0;
+  size_t signlen = 0;
   SArchiveSignature *signature = nil;
   OSStatus err = SecIdentityCopyPrivateKey(identity, &pkey);
   if (noErr == err) {
-    const CSSM_KEY *key = NULL;
-    err = SecKeyGetCSSMKey(pkey, &key);
-    if (noErr == err)
-      signlen = key->KeyHeader.LogicalKeySizeInBits / 8;
+    signlen = SecKeyGetBlockSize(pkey);
     CFRelease(pkey);
   }
   if (signlen > 0) {
     xar_signature_t sign = xar_signature_new(arch, [kSArchiveSignatureSHA1WithRSA UTF8String], signlen, _SArchiveSigner, identity);
     if (sign) {
       signature = [[SArchiveSignature alloc] initWithArchive:arch signature:sign];
-      [signature setIndentity:identity];
+      signature->_identity = SPXCFRetain(identity);
     }
   }
   return [signature autorelease];
@@ -145,37 +143,27 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
   sa_arch = (void *)arch;
 }
 
-- (void)setIndentity:(SecIdentityRef)identity {
-  NSParameterAssert(sa_identity == NULL);
-  sa_identity = identity;
-  CFRetain(sa_identity);
-}
-
 @end
 
 #pragma mark -
 #pragma mark Signature
 int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint32_t length, uint8_t **signed_data, uint32_t *signed_len) {
   SecKeyRef pkey = NULL;
-  uint32_t signlen = 0;
+  size_t signlen = 0;
   SecIdentityRef ident = (SecIdentityRef)context;
   OSStatus err = SecIdentityCopyPrivateKey(ident, &pkey);
-  if (noErr == err) {
-    const CSSM_KEY *key = NULL;
-    err = SecKeyGetCSSMKey(pkey, &key);
-    if (noErr == err)
-      signlen = key->KeyHeader.LogicalKeySizeInBits / 8;
-  }
+  if (noErr == err)
+    signlen = SecKeyGetBlockSize(pkey);
   if (signlen > 0) {
     CSSM_DATA digest = { length, data };
-    CSSM_DATA signature = { signlen, malloc(signlen) };
+    CSSM_DATA signature = { signlen, static_cast<uint8_t *>(malloc(signlen)) };
     err = WBSecuritySignData(pkey, kSecCredentialTypeDefault, &digest, &signature);
     if (noErr == err) {
       *signed_len = (uint32_t)signature.Length;
       *signed_data = signature.Data;
     }
   }
-  if (pkey) CFRelease(pkey);
+  SPXCFRelease(pkey);
   
   return err;
 }

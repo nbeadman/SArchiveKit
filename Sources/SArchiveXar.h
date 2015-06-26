@@ -46,32 +46,32 @@ NSInteger SArchiveXarSubDocSetAttribute(xar_subdoc_t doc, NSString *property, NS
 #import <SArchiveKit/SArchiveDocument.h>
 #import <SArchiveKit/SArchiveSignature.h>
 
-#if defined(__cplusplus)
-#  define sa_xar  static_cast<xar_t>(sa_arch)
-#  define sa_file static_cast<xar_file_t>(sa_ptr)
-#  define sa_doc  static_cast<xar_subdoc_t>(sa_ptr)
-#  define sa_sign static_cast<xar_signature_t>(sa_ptr)
-#else
-#  define sa_xar  (xar_t)sa_arch
-#  define sa_file (xar_file_t)sa_ptr
-#  define sa_doc  (xar_subdoc_t)sa_ptr
-#  define sa_sign (xar_signature_t)sa_ptr
-#endif
+SARCHIVE_INLINE
+const char *SArchiveGetPath(NSURL *url, bool resolve) {
+  if (!url)
+    return NULL;
+  if (resolve && [url isFileReferenceURL])
+    url = url.filePathURL;
+  if (NSFoundationVersionNumber >= NSFoundationVersionNumber10_9)
+    return url.fileSystemRepresentation;
+  return url.path.fileSystemRepresentation;
+}
 
 @interface SArchiveFile ()
 
-- (id)initWithArchive:(xar_t)arch file:(xar_file_t)ptr;
+- (instancetype)initWithArchive:(xar_t)arch file:(xar_file_t)ptr;
 
-- (xar_file_t)file;
-- (void)setFile:(xar_file_t)file;
+@property(nonatomic, readonly) xar_file_t file;
 
-- (xar_t)archive;
-- (void)setArchive:(xar_t)arch;
+@property(nonatomic, readonly) xar_t archive;
 
 - (void)addFile:(SArchiveFile *)aFile;
 - (SArchiveFile *)fileAtIndex:(NSUInteger)anIndex;
+
 //- (void)removeFile:(SArchiveFile *)aFile;
+
 - (void)removeAllFiles;
+
 //- (void)removeFileAtIndex:(NSUInteger)anIndex;
 //- (void)insertFile:(SArchiveFile *)aFile atIndex:(NSUInteger)anIndex;
 
@@ -79,24 +79,18 @@ NSInteger SArchiveXarSubDocSetAttribute(xar_subdoc_t doc, NSString *property, NS
 
 @interface SArchiveDocument ()
 
-- (id)initWithArchive:(xar_t)arch document:(xar_subdoc_t)ptr;
+- (instancetype)initWithDocument:(xar_subdoc_t)ptr;
 
-- (xar_t)archive;
-- (void)setArchive:(xar_t)arch;
-
-- (xar_subdoc_t)document;
-- (void)setDocument:(xar_subdoc_t)document;
+@property(nonatomic, readonly) xar_subdoc_t document;
 
 @end
 
 @interface SArchiveSignature ()
 
 + (SArchiveSignature *)signatureWithIdentity:(SecIdentityRef)identity archive:(xar_t)arch;
-- (id)initWithArchive:(xar_t)arch signature:(xar_signature_t)ptr;
+- (instancetype)initWithSignature:(xar_signature_t)ptr;
 
-@property(nonatomic) xar_t archive;
-
-@property(nonatomic) xar_signature_t signature;
+@property(nonatomic, readonly) xar_signature_t signature;
 
 
 @end

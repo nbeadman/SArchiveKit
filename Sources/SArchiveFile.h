@@ -8,7 +8,7 @@
 
 #import <SArchiveKit/SABase.h>
 
-enum {
+typedef NS_ENUM(NSInteger, SArchiveType) {
   kSArchiveTypeUndefined = 0,
   kSArchiveTypeFile,
   kSArchiveTypeSymlink,
@@ -23,32 +23,22 @@ enum {
 };
 
 SARCHIVE_OBJC_EXPORT
-@interface SArchiveFile : NSObject {
-@private
-  void *sa_ptr;
-  void *sa_arch;
-  NSString *sa_name;
-  NSString *sa_path;
-  
-  SArchiveFile *sa_parent;
-  NSMutableArray *sa_files;
-}
+@interface SArchiveFile : NSObject <NSFastEnumeration>
 
 @property(nonatomic, copy) NSString *path;
 
-- (NSInteger)type;
-- (UInt64)size;
+@property(nonatomic, readonly) SArchiveType type;
+@property(nonatomic, readonly) uint64_t size;
 
 @property(nonatomic, copy) NSString *name;
 
-- (mode_t)posixPermissions;
-- (void)setPosixPermissions:(mode_t)perm;
+@property(nonatomic) mode_t posixPermissions;
 
 - (BOOL)verify;
 - (BOOL)extract;
+
 - (NSData *)extractContents;
-- (BOOL)extractToPath:(NSString *)path;
-//- (BOOL)extractToStream:(NSOutputStream *)aStream handler:(id)handler;
+- (BOOL)extractAtURL:(NSURL *)url;
 
 - (NSFileWrapper *)fileWrapper;
 - (SArchiveFile *)fileWithName:(NSString *)name;
@@ -62,17 +52,12 @@ SARCHIVE_OBJC_EXPORT
 - (void)setValue:(NSString *)value forAttribute:(NSString *)attr property:(NSString *)property;
 
 #pragma mark -
-- (SArchiveFile *)container;
+@property(nonatomic, readonly) SArchiveFile *container;
 
-- (NSArray *)files;
-- (NSUInteger)count;
+@property(nonatomic, readonly) NSArray *files;
+@property(nonatomic, readonly) NSUInteger count;
 
 /* deep enumerator */
 - (NSEnumerator *)enumerator;
 
 @end
-
-//@interface NSObject (SArchiveFileHandler)
-//- (void)extractingFile:(SArchiveFile *)file progress:(CGFloat)progress;
-//@end
-

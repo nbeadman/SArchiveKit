@@ -9,12 +9,7 @@
 #import <SArchiveKit/SABase.h>
 
 SARCHIVE_OBJC_EXPORT
-@interface SArchiveDocument : NSObject {
-@private
-  void *sa_ptr;
-  void *sa_arch;
-  NSString *sa_name;
-}
+@interface SArchiveDocument : NSObject
 
 @property(nonatomic, copy) NSString *name;
 

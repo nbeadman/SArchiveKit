@@ -29,14 +29,19 @@ NSString * const SArchiveOptionOwnershipNumeric = @XAR_OPT_VAL_NUMERIC;
 /* Preserve setuid/getuid */
 NSString * const SArchiveOptionSaveSUID = @XAR_OPT_SAVESUID;
 
+NSString * const SArchiveOptionValueTrue = @XAR_OPT_VAL_TRUE;
+NSString * const SArchiveOptionValueFalse = @XAR_OPT_VAL_FALSE;
+
 /* set the toc checksum algorithm */
 NSString * const SArchiveOptionTocCheckSumKey = @XAR_OPT_TOCCKSUM;
 /* set the file checksum algorithm */
 NSString * const SArchiveOptionFileCheckSumKey = @XAR_OPT_FILECKSUM;
 
 NSString * const SArchiveOptionCheckSumNone = @XAR_OPT_VAL_NONE;
-NSString * const SArchiveOptionCheckSHA1 = @XAR_OPT_VAL_SHA1;
-NSString * const SArchiveOptionCheckMD5 = @XAR_OPT_VAL_MD5;
+NSString * const SArchiveOptionCheckSumSHA1 = @XAR_OPT_VAL_SHA1;
+NSString * const SArchiveOptionCheckSumSHA256 = @XAR_OPT_VAL_SHA256;
+NSString * const SArchiveOptionCheckSumSHA512 = @XAR_OPT_VAL_SHA512;
+NSString * const SArchiveOptionCheckSumMD5 = @XAR_OPT_VAL_MD5;
 
 /* set the file compression type */
 NSString * const SArchiveOptionCompressionKey = @XAR_OPT_COMPRESSION;
@@ -49,229 +54,216 @@ NSString * const SArchiveOptionCompressionLZMA = @XAR_OPT_VAL_LZMA;
 NSString * const SArchiveOptionIncludedProperty = @XAR_OPT_PROPINCLUDE;
 NSString * const SArchiveOptionExcludedProperty = @XAR_OPT_PROPEXCLUDE;
 
-//#define XAR_OPT_RSIZE       "rsize"       /* Read io buffer size */
-//
-//#define XAR_OPT_COALESCE    "coalesce"    /* Coalesce identical heap blocks */
-//#define XAR_OPT_LINKSAME    "linksame"    /* Hardlink identical files */
+/* Read io buffer size */
+NSString * const SArchiveOptionReadBufferSize = @XAR_OPT_RSIZE;
 
+/* Coalesce identical heap blocks */
+NSString * const SArchiveOptionCoalesce = @XAR_OPT_COALESCE;
+/* Hardlink identical files */
+NSString * const SArchiveOptionLinkSame = @XAR_OPT_LINKSAME;
 
 static
 int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void *usrctx);
 
-@interface SArchiveEnumerator : NSEnumerator {
-  NSMapEnumerator sa_enumerator;
-}
-
-- (id)initWithMapTable:(NSMapTable *)table;
-
-@end
-
 #pragma mark -
-@implementation SArchive
+@implementation SArchive {
+@private
+  xar_t sa_arch;
+  SArchiveFile *_rootFile;
 
-- (id)initWithArchiveAtPath:(NSString *)path {
-  return [self initWithArchiveAtPath:path write:NO];
+  NSMapTable *_files;
+  NSMutableArray *_signatures;
+  NSMutableDictionary *_documents;
+
+  /* extract context */
+  id<SArchiveHandler> sa_delegate;
+
+  bool _ok;
+  volatile bool _cancel;
+  volatile int32_t _extracting; /* atomic lock */
 }
 
-- (id)initWithArchiveAtPath:(NSString *)path write:(BOOL)flag {
-  if (self = [super init]) {
-    sa_arch = (void *)xar_open([path fileSystemRepresentation], flag ? WRITE : READ);
-    if (!sa_arch) {
-      [self release];
-      self = nil;
-    } else {
-      sa_path = [path copy];
-      xar_register_errhandler(sa_arch, sa_xar_err_handler, self);
-      sa_files = NSCreateMapTable(NSNonOwnedPointerMapKeyCallBacks, NSObjectMapValueCallBacks, 0);
-    }
-  }
-  return self;
+- (instancetype)initWithURL:(NSURL *)anURL {
+  return [self initWithURL:anURL writable:NO];
 }
 
-- (id)initWithArchiveAtURL:(NSURL *)anURL {
-  return [self initWithArchiveAtURL:anURL write:NO];
-}
-- (id)initWithArchiveAtURL:(NSURL *)anURL write:(BOOL)flag {
+- (instancetype)initWithURL:(NSURL *)anURL writable:(BOOL)flag {
   if (![anURL isFileURL]) {
     [self release];
     SPXThrowException(NSInvalidArgumentException, @"Unsupported URL scheme");
   }
-  return [self initWithArchiveAtPath:[anURL path] write:flag];
+  if (self = [super init]) {
+    // Note: -[NSURL fileSystemRepresentation] is 10.9 only
+    sa_arch = (void *)xar_open(SArchiveGetPath(anURL, false), flag ? WRITE : READ);
+    if (!sa_arch) {
+      [self release];
+      self = nil;
+    } else {
+      _URL = [anURL retain];
+      xar_register_errhandler(sa_arch, sa_xar_err_handler, self);
+      _files = NSCreateMapTable(NSNonOwnedPointerMapKeyCallBacks, NSObjectMapValueCallBacks, 0);
+    }
+  }
+  return self;
 }
 
 - (void)dealloc {
   if (sa_arch) {
     [self close];
   }
-  [sa_path release];
+  [_URL release];
   [super dealloc];
 }
 
 #pragma mark -
 - (SArchiveFile *)sa_findFile:(xar_file_t)file {
-  return file ? NSMapGet(sa_files, file) : nil;
+  return file ? NSMapGet(_files, file) : nil;
 }
+
 - (SArchiveFile *)sa_addFile:(xar_file_t)file name:(NSString *)name parent:(SArchiveFile *)parent {
   SArchiveFile *f = nil;
   if (file) {
-    f = [[SArchiveFile alloc] initWithArchive:sa_xar file:file];
+    f = [[SArchiveFile alloc] initWithArchive:sa_arch file:file];
     if (f) {
-      [f setName:name];
-      NSMapInsert(sa_files, file, f);
+      f.name = name;
+      NSMapInsert(_files, file, f);
       if (parent)
         [parent addFile:f];
       else
-        [sa_roots addObject:f];
+        [_rootFile addFile:f];
     }
   }
   return [f autorelease];
 }
 
 - (void)loadTOC {
-  if (!sa_roots) {
-    sa_roots = [[NSMutableArray alloc] init];
+  if (!_rootFile) {
+    _rootFile = [[SArchiveFile alloc] initWithArchive:sa_arch file:NULL];
+
     xar_file_t file = NULL;
     xar_iter_t files = xar_iter_new();
-    file = xar_file_first(sa_xar, files);
+    file = xar_file_first(sa_arch, files);
     while (file) {
       SArchiveFile *f = [self sa_findFile:file];
       if (!f) {
         SArchiveFile *p = [self sa_findFile:xar_file_get_parent(file)];
         f = [self sa_addFile:file name:nil parent:p];
       }
-      if (f && ![f name]) {
-        [f setName:SArchiveXarFileGetProperty(file, @"name")];
-      }
       file = xar_file_next(files);
     }
     xar_iter_free(files);
   } 
 }
+
 - (void)loadSignatures {
-  if (!sa_signatures) {
-    sa_signatures = [[NSMutableArray alloc] init];
+  if (!_signatures) {
+    _signatures = [[NSMutableArray alloc] init];
     xar_signature_t sign = xar_signature_first(sa_arch);
     while (sign) {
-      SArchiveSignature *asign = [[SArchiveSignature alloc] initWithArchive:sa_arch signature:sign];
-      [sa_signatures addObject:asign];
+      SArchiveSignature *asign = [[SArchiveSignature alloc] initWithSignature:sign];
+      [_signatures addObject:asign];
       [asign release];
       sign = xar_signature_next(sign);
     }
   }
 }
 
-- (NSString *)path {
-  return sa_path;
-}
-
 - (void)close {
   if (sa_arch) {
-    xar_close(sa_xar);
+    xar_close(sa_arch);
     sa_arch = NULL;
-    if (sa_files) {
-      NSFreeMapTable(sa_files);
-      sa_files = NULL;
+    if (_files) {
+      NSFreeMapTable(_files);
+      _files = NULL;
     }
-    [sa_roots release];
-    sa_roots = nil;
+    [_rootFile release];
+    _rootFile = nil;
     
-    [sa_documents release];
-    sa_documents = nil;
+    [_documents release];
+    _documents = nil;
     
-    [sa_signatures release]; 
-    sa_signatures = nil;
+    [_signatures release];
+    _signatures = nil;
   }
 }
 
-- (NSArray *)files {
+- (uint64_t)size {
   [self loadTOC];
-  return sa_roots;
-}
-
-- (UInt64)size {
-  [self loadTOC];
-  UInt64 size = 0;
+  uint64_t size = 0;
   SArchiveFile *file;
-  NSMapEnumerator files = NSEnumerateMapTable(sa_files);
+  NSMapEnumerator files = NSEnumerateMapTable(_files);
   while (NSNextMapEnumeratorPair(&files, NULL, (void **)&file)) {
-    size += [file size];
+    size += file.size;
   }
   NSEndMapTableEnumeration(&files);
   return size;
 }
 
+- (NSArray *)rootFiles {
+  [self loadTOC];
+  return _rootFile.files;
+}
+
 - (NSUInteger)fileCount {
   [self loadTOC];
-  return NSCountMapTable(sa_files);
+  return NSCountMapTable(_files);
 }
 
 - (NSEnumerator *)fileEnumerator {
   [self loadTOC];
-  return [[[SArchiveEnumerator alloc] initWithMapTable:sa_files] autorelease];
+  return [_rootFile enumerator];
 }
 
 - (SArchiveFile *)fileWithName:(NSString *)name {
-  NSArray *files = [self files];
-  NSUInteger cnt = [files count];
-  while (cnt-- > 0) {
-    SArchiveFile *file = [files objectAtIndex:cnt];
-    if ([[file name] isEqualToString:name])
-      return file;
-  }
-  return nil;
+  [self loadTOC];
+  return [_rootFile fileWithName:name];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len {
   [self loadTOC];
-  return [sa_files countByEnumeratingWithState:state objects:stackbuf count:len];
+  return [_rootFile countByEnumeratingWithState:state objects:stackbuf count:len];
 }
 
 #pragma mark Options
-- (void)includeProperty:(NSString *)name {
-  [self setValue:name forOption:SArchiveOptionIncludedProperty];
-}
-- (void)excludeProperty:(NSString *)name {
-  [self setValue:name forOption:SArchiveOptionExcludedProperty];
-}
 - (NSString *)valueForOption:(NSString *)key {
-  const char *opt = xar_opt_get(sa_xar, [key UTF8String]);
+  const char *opt = xar_opt_get(sa_arch, [key UTF8String]);
   if (opt)
     return [NSString stringWithUTF8String:opt];
   return nil;
 }
 
 - (void)setValue:(NSString *)opt forOption:(NSString *)key {
-  xar_opt_set(sa_xar, [key UTF8String], [opt UTF8String]);
+  xar_opt_set(sa_arch, [key UTF8String], [opt UTF8String]);
 }
 
 - (BOOL)boolValueForOption:(NSString *)key {
-  const char *opt = xar_opt_get(sa_xar, [key UTF8String]);
+  const char *opt = xar_opt_get(sa_arch, [key UTF8String]);
   if (opt) return 0 == strcmp(opt, XAR_OPT_VAL_TRUE);
   return NO;
 }
 - (void)setBoolValue:(BOOL)value forOption:(NSString *)key {
-  xar_opt_set(sa_xar, [key UTF8String], value ? XAR_OPT_VAL_TRUE : XAR_OPT_VAL_FALSE);
+  xar_opt_set(sa_arch, [key UTF8String], value ? XAR_OPT_VAL_TRUE : XAR_OPT_VAL_FALSE);
 }
 
-- (SArchiveFile *)addFile:(NSString *)path {
-  xar_file_t file = xar_add(sa_xar, [path fileSystemRepresentation]);
+- (SArchiveFile *)addFileAtURL:(NSURL *)url {
+  xar_file_t file = xar_add(sa_arch, SArchiveGetPath(url, true));
   return [self sa_addFile:file name:nil parent:file ? [self sa_findFile:xar_file_get_parent(file)] : NULL];
 }
 
-- (SArchiveFile *)addFile:(NSString *)path name:(NSString *)name parent:(SArchiveFile *)parent {
-  xar_file_t file = xar_add_frompath(sa_xar, [parent file], [name UTF8String], [path fileSystemRepresentation]);
+- (SArchiveFile *)addFileAtURL:(NSURL *)url name:(NSString *)name parent:(SArchiveFile *)parent {
+  xar_file_t file = xar_add_frompath(sa_arch, [parent file], [name UTF8String], SArchiveGetPath(url, true));
   return [self sa_addFile:file name:name parent:parent];
 }
 
-- (SArchiveFile *)addFile:(NSString *)name data:(NSData *)data parent:(SArchiveFile *)parent {
-  xar_file_t file = xar_add_frombuffer(sa_xar, [parent file], [name UTF8String], [data bytes], [data length]);
+- (SArchiveFile *)addFileWithName:(NSString *)name content:(NSData *)data parent:(SArchiveFile *)parent {
+  xar_file_t file = xar_add_frombuffer(sa_arch, [parent file], [name UTF8String], [data bytes], [data length]);
   SArchiveFile *f = [self sa_addFile:file name:name parent:parent];
   if (f)
     [f setPosixPermissions:0644];
   return f;
 }
 
-- (SArchiveFile *)addFolder:(NSString *)name properties:(NSDictionary *)props parent:(SArchiveFile *)parent {
+- (SArchiveFile *)addFolderWithName:(NSString *)name properties:(NSDictionary *)props parent:(SArchiveFile *)parent {
   struct stat info;
   bzero(&info, sizeof(info));
   NSNumber *num;
@@ -322,7 +314,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   info.st_mode &= ~S_IFMT;
   info.st_mode |= S_IFDIR;
   
-  xar_file_t file = xar_add_folder(sa_xar, [parent file], [name UTF8String], &info);
+  xar_file_t file = xar_add_folder(sa_arch, [parent file], [name UTF8String], &info);
   return [self sa_addFile:file name:name parent:parent];
 }
 
@@ -339,7 +331,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 		SPXThrowException(NSInvalidArgumentException, @"Invalid file wrapper name.");
   
   if ([aWrapper isDirectory]) {
-    file = [self addFolder:name properties:nil parent:parent];
+    file = [self addFolderWithName:name properties:nil parent:parent];
     /* Add sub wrappers */
     NSFileWrapper *wrapper;
     NSEnumerator *wrappers = [[aWrapper fileWrappers] objectEnumerator];
@@ -347,7 +339,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
       [self addFileWrapper:wrapper parent:file];
     }
   } else if ([aWrapper isRegularFile]) {
-    file = [self addFile:name data:[aWrapper regularFileContents] parent:parent];
+    file = [self addFileWithName:name content:[aWrapper regularFileContents] parent:parent];
   } else if ([aWrapper isSymbolicLink]) {
 		SPXThrowException(NSInvalidArgumentException, @"%s does not currently support symlink", __func__);
   } else {
@@ -366,32 +358,32 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 
 #pragma mark -
 - (SArchiveDocument *)documentWithName:(NSString *)name {
-  if (!sa_documents) {
-    sa_documents = [[NSMutableDictionary alloc] init];
-    xar_subdoc_t doc = xar_subdoc_first(sa_xar);
+  if (!_documents) {
+    _documents = [[NSMutableDictionary alloc] init];
+    xar_subdoc_t doc = xar_subdoc_first(sa_arch);
     while (doc) {
       NSString *docname = [NSString stringWithUTF8String:xar_subdoc_name(doc)];
-      SArchiveDocument *d = [[SArchiveDocument alloc] initWithArchive:sa_xar document:doc];
+      SArchiveDocument *d = [[SArchiveDocument alloc] initWithDocument:doc];
       if (d) {
         [d setName:docname];
-        [sa_documents setObject:d forKey:docname];
+        [_documents setObject:d forKey:docname];
         [d release];
       }
       doc = xar_subdoc_next(doc);
     }
   }
-  return [sa_documents objectForKey:name];
+  return [_documents objectForKey:name];
 }
 
 - (SArchiveDocument *)addDocumentWithName:(NSString *)name {
   if (!name)
 		SPXThrowException(NSInvalidArgumentException, @"name MUST not be nil");
-  xar_subdoc_t doc = xar_subdoc_new(sa_xar, [name UTF8String]);
+  xar_subdoc_t doc = xar_subdoc_new(sa_arch, [name UTF8String]);
   if (doc) {
-    SArchiveDocument *document = [[SArchiveDocument alloc] initWithArchive:sa_xar document:doc];
+    SArchiveDocument *document = [[SArchiveDocument alloc] initWithDocument:doc];
     if (document) {
       [document setName:name];
-      [sa_documents setObject:document forKey:name];
+      [_documents setObject:document forKey:name];
     }
     return [document autorelease];
   }
@@ -400,7 +392,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 
 - (NSArray *)signatures {
   [self loadSignatures];
-  return sa_signatures;
+  return _signatures;
 }
 - (SArchiveSignature *)addSignature:(SecIdentityRef)identity {
   return [self addSignature:identity includeCertificate:NO];
@@ -409,7 +401,7 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
   SArchiveSignature *sign = [SArchiveSignature signatureWithIdentity:identity archive:sa_arch];
   if (sign) {
     [self loadSignatures];
-    [sa_signatures addObject:sign];
+    [_signatures addObject:sign];
   }
   /* include certificate */
   if (sign && include) {
@@ -423,73 +415,75 @@ int32_t sa_xar_err_handler(int32_t severit, int32_t err, xar_errctx_t ctx, void 
 }
 
 #pragma mark Extract
-- (void)sa_extractToPath:(NSString *)dest {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  
-  sa_arFlags.ok = 1;
-  sa_arFlags.cancel = 0;
-  
-  /* standardize base path */
-  dest = [dest stringByStandardizingPath];
-  
-  /* Note: Cannot make IMP caching as this will short-cut interthread messaging */
-  bool should = [sa_delegate respondsToSelector:@selector(archive:shouldProcessFile:)];
-  bool will = [sa_delegate respondsToSelector:@selector(archive:willProcessFile:)];
-  bool did = [sa_delegate respondsToSelector:@selector(archive:didProcessFile:path:)];
-  
-  xar_file_t file = NULL;
-  xar_iter_t files = xar_iter_new();
-  file = xar_file_first(sa_xar, files);
-  while (file && sa_arFlags.ok && !sa_arFlags.cancel) {
-    SArchiveFile *f = [self sa_findFile:file];
-    NSAssert(f != NULL, @"Cannot find file object");
-    
-    if (!should || [sa_delegate archive:self shouldProcessFile:f]) {
-      /* Notify handler */
-      if (will) [sa_delegate archive:self willProcessFile:f];
-      /* process file */
-      bool result = false;
-      
-      NSString *fspath = dest ? [dest stringByAppendingPathComponent:[f path]] : [f path];
-      if (dest)
-        result = [f extractToPath:fspath];
-      else
-        result = [f extract];
-      
-      if (result && did) [sa_delegate archive:self didProcessFile:f path:fspath];
+- (void)sa_extractAtURL:(NSURL *)dest {
+  @autoreleasepool {
+    _ok = true;
+    _cancel = false;
+
+    /* standardize base path */
+    dest = dest.filePathURL.URLByStandardizingPath;
+
+    /* Note: Cannot make IMP caching as this will short-cut interthread messaging */
+    bool should = [sa_delegate respondsToSelector:@selector(archive:shouldProcessFile:)];
+    bool will = [sa_delegate respondsToSelector:@selector(archive:willProcessFile:)];
+
+    bool did_url = [sa_delegate respondsToSelector:@selector(archive:didExtractFile:atURL:)];
+
+    xar_file_t file = NULL;
+    xar_iter_t files = xar_iter_new();
+    file = xar_file_first(sa_arch, files);
+    while (file && _ok && !_cancel) {
+      SArchiveFile *f = [self sa_findFile:file];
+      NSAssert(f != NULL, @"Cannot find file object");
+
+      if (!should || [sa_delegate archive:self shouldProcessFile:f]) {
+        /* Notify handler */
+        if (will)
+          [sa_delegate archive:self willProcessFile:f];
+        /* process file */
+        bool result = false;
+
+        NSURL *fspath = dest ? [dest URLByAppendingPathComponent:f.path] : [NSURL fileURLWithPath:f.path];
+        if (dest)
+          result = [f extractAtURL:fspath];
+        else
+          result = [f extract];
+
+        if (result && did_url)
+          [sa_delegate archive:self didExtractFile:false atURL:fspath];
+      }
+      /* prepare next file */
+      file = xar_file_next(files);
     }
-    /* prepare next file */
-    file = xar_file_next(files);
+    xar_iter_free(files);
+
+    /* Notify end of extraction */
+    if ([sa_delegate respondsToSelector:@selector(archive:didExtractContent:atURL:)])
+      [sa_delegate archive:self didExtractContent:(_ok && !_cancel) atURL:dest];
   }
-  xar_iter_free(files);
-  
-  /* Notify end of extraction */
-  if ([sa_delegate respondsToSelector:@selector(archive:didExtract:path:)])
-    [sa_delegate archive:self didExtract:(sa_arFlags.ok && !sa_arFlags.cancel) path:dest];
-  
-  /* release handler */
-  [sa_delegate release];
-  sa_delegate = nil;
-  sa_extract = 0;
-  [pool release];
 }
 
-- (BOOL)extractToPath:(NSString *)path handler:(id)handler {
-  if (!OSAtomicCompareAndSwap32(0, 1, &sa_extract))
+- (BOOL)extractAtURL:(NSURL *)anURL handler:(id<SArchiveHandler>)handler {
+  if (!OSAtomicCompareAndSwap32(0, 1, &_extracting))
 		SPXThrowException(NSInternalInconsistencyException, @"%@ is already extracting data", self);
   
   /* preload archive (if not already done) */
   [self loadTOC];
   sa_delegate = [handler retain];
   
-  [self sa_extractToPath:path];
+  [self sa_extractAtURL:anURL];
+
+  /* release handler */
+  [sa_delegate release];
+  sa_delegate = nil;
+  _extracting = 0;
   
-  return sa_arFlags.ok && !sa_arFlags.cancel;
+  return _ok && !_cancel;
 }
 
 /* cancel background extraction */
 - (void)cancel {
-  sa_arFlags.cancel = 1;
+  _cancel = true;
 }
 
 NSString * const SArchiveErrorDomain = @"org.shadowlab.sarchive.error";
@@ -497,7 +491,7 @@ NSString * const SArchiveErrorDomain = @"org.shadowlab.sarchive.error";
 - (int32_t)handleError:(int32_t)instance severity:(int32_t)severity context:(xar_errctx_t)errctxt {
   /* ignore error if we are not extracting an archive */
   if (!sa_delegate || ![sa_delegate respondsToSelector:@selector(archive:shouldProceedAfterError:severity:)]) {
-		sa_arFlags.ok = severity <= XAR_SEVERITY_WARNING ? 1 : 0;
+		_ok = severity <= XAR_SEVERITY_WARNING ? 1 : 0;
     return 0;
 	}
   
@@ -528,12 +522,12 @@ NSString * const SArchiveErrorDomain = @"org.shadowlab.sarchive.error";
 		case XAR_SEVERITY_NORMAL:
     case XAR_SEVERITY_WARNING:
     case XAR_SEVERITY_NONFATAL:
-      sa_arFlags.ok = [sa_delegate archive:self shouldProceedAfterError:error severity:severity] ? 1 : 0;
+      _ok = [sa_delegate archive:self shouldProceedAfterError:error severity:severity] ? 1 : 0;
       break;
     case XAR_SEVERITY_FATAL:
       /* call handler but ignore the response */
       [sa_delegate archive:self shouldProceedAfterError:error severity:severity];
-      sa_arFlags.ok = 0;
+      _ok = 0;
       break;
   }
   [error release];
@@ -547,40 +541,4 @@ int32_t sa_xar_err_handler(int32_t severity, int32_t instance, xar_errctx_t errc
   return [archive handleError:instance severity:severity context:errctxt];
 }
 
-#pragma mark -
-@implementation SArchiveEnumerator
-
-- (id)initWithMapTable:(NSMapTable *)table {
-  NSParameterAssert(table);
-  if (self = [super init]) {
-    sa_enumerator = NSEnumerateMapTable(table);
-  }
-  return self;
-}
-
-- (void)dealloc {
-  NSEndMapTableEnumeration(&sa_enumerator);
-  [super dealloc];
-}
-
-- (id)nextObject {
-  void *object = NULL;
-  if (NSNextMapEnumeratorPair(&sa_enumerator, NULL, &object)) {
-    return object;
-  }
-  NSEndMapTableEnumeration(&sa_enumerator);
-  return nil;
-}
-
-/* Warning: a map can contains something that's not an NSObject (ie: integer) */
-- (NSArray *)allObjects {
-  id object = nil;
-  NSMutableArray *objects = [[NSMutableArray alloc] init];
-  while (object = [self nextObject]) {
-    [objects addObject:object];
-  }
-  return [objects autorelease];
-}
-
-@end
 

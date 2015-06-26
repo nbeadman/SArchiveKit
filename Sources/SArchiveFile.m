@@ -20,32 +20,35 @@
 
 @end
 
-@implementation SArchiveFile
+@interface SArchiveFile ()
+@property(nonatomic, assign) SArchiveFile *container;
+@end
 
-@synthesize path = sa_path;
-@synthesize name = sa_name;
+@implementation SArchiveFile {
+  NSMutableArray *sa_files;
+}
 
 - (void)dealloc {
   [self removeAllFiles];
   [sa_files release];
-  [sa_path release];
-  [sa_name release];
+  [_path release];
+  [_name release];
   [super dealloc];
 }
 
 #pragma mark -
 - (NSString *)path {
-  if (!sa_path && sa_file) {
-    char *buffer = xar_get_path(sa_file);
+  if (!_path && _file) {
+    char *buffer = xar_get_path(_file);
     if (buffer) {
-      sa_path = [[NSString alloc] initWithUTF8String:buffer];
+      _path = [[NSString alloc] initWithUTF8String:buffer];
       free(buffer);
     }
   }
-  return sa_path;
+  return _path;
 }
 
-- (NSInteger)type {
+- (SArchiveType)type {
   NSString *type = [self valueForProperty:@"type"];
   /* common cases */
   if ([type isEqualToString:@"file"])
@@ -64,16 +67,16 @@
   if ([type isEqualToString:@"character special"])
     return kSArchiveTypeCharacterSpecial;
   
-  if ([type isEqualToString:@"whiteout"]) 
+  if ([type isEqualToString:@"without"]) 
     return kSArchiveTypeWithout;
   
   return kSArchiveTypeUndefined;
 }
 
 - (UInt64)size {
-  if (sa_ptr) {
+  if (_file) {
     const char *sizestring = NULL;
-    if(0 == xar_prop_get(sa_file, "data/size", &sizestring)) {
+    if(0 == xar_prop_get(_file, "data/size", &sizestring)) {
       return strtoull(sizestring, (char **)NULL, 10);
     }
   }
@@ -81,10 +84,10 @@
 }
 
 - (NSString *)name {
-  if (!sa_name && sa_file) {
-    sa_name = [[self valueForProperty:@"name"] retain];
+  if (!_name && _file) {
+    _name = [[self valueForProperty:@"name"] retain];
   }
-  return sa_name;
+  return _name;
 }
 
 - (mode_t)posixPermissions {
@@ -108,36 +111,22 @@
 }
 
 - (BOOL)verify {
-  return 0 == xar_verify(sa_xar, sa_file);
+  return _file && 0 == xar_verify(_archive, _file);
 }
 
 - (BOOL)extract {
-  return 0 == xar_extract(sa_xar, sa_file);
+  return _file && 0 == xar_extract(_archive, _file);
 }
 
-- (BOOL)extractToPath:(NSString *)path {
-  return 0 == xar_extract_tofile(sa_xar, sa_file, [path fileSystemRepresentation]);
+- (BOOL)extractAtURL:(NSURL *)url {
+  return _file && 0 == xar_extract_tofile(_archive, _file, SArchiveGetPath(url, false));
 }
-
-//- (BOOL)extractToStream:(NSOutputStream *)aStream handler:(id)handler {
-//  xar_stream stream;
-//  bzero(&stream, sizeof(stream));
-//  int err = xar_extract_tostream_init(sa_xar, sa_file, &stream);
-//  if (XAR_STREAM_OK == err) {
-//    UInt64 size = [self size];
-//    //err = xar_extract_tostream(<#xar_stream * stream#>)
-//    
-//    /* release resources */
-//    xar_extract_tostream_end(&stream);
-//  }
-//  return XAR_STREAM_END == err;
-//}
 
 - (NSData *)extractContents {
   size_t size = 0;
   NSData *data = nil;
   char *buffer = NULL;
-  if (0 != xar_extract_tobuffersz(sa_xar, sa_file, &buffer, &size)) {
+  if (_file && 0 != xar_extract_tobuffersz(_archive, _file, &buffer, &size)) {
     if (buffer) free(buffer);
   } else if (buffer) {
     data = [NSData dataWithBytesNoCopy:buffer length:size freeWhenDone:YES];
@@ -146,6 +135,9 @@
 }
 
 - (NSFileWrapper *)fileWrapper {
+  if (!_file)
+    return nil;
+
   NSFileWrapper *file = nil;
   switch ([self type]) {
     case kSArchiveTypeDirectory: {
@@ -186,10 +178,8 @@
 }
 
 - (SArchiveFile *)fileWithName:(NSString *)name {
-  NSUInteger idx = [sa_files count];
-  while (idx-- > 0) {
-    SArchiveFile *file = [sa_files objectAtIndex:idx];
-    if ([[file name] isEqualToString:name])
+  for (SArchiveFile *file in sa_files) {
+    if ([file.name isEqualToString:name])
       return file;
   }
   return nil;
@@ -197,18 +187,20 @@
 
 /* Properties */
 - (NSString *)valueForProperty:(NSString *)prop {
-  return SArchiveXarFileGetProperty(sa_file, prop);
+  return _file ? SArchiveXarFileGetProperty(_file, prop) : nil;
 }
 - (void)setValue:(NSString *)value forProperty:(NSString *)prop {
-  SArchiveXarFileSetProperty(sa_file, prop, value);
+  if (_file)
+    SArchiveXarFileSetProperty(_file, prop, value);
 }
 
 /* Attributes */
 - (NSString *)valueForAttribute:(NSString *)attr property:(NSString *)prop {
-  return SArchiveXarFileGetAttribute(sa_file, prop, attr);
+  return _file ? SArchiveXarFileGetAttribute(_file, prop, attr) : nil;
 }
 - (void)setValue:(NSString *)value forAttribute:(NSString *)attr property:(NSString *)property {
-  SArchiveXarFileSetAttribute(sa_file, property, attr, value);
+  if (_file)
+    SArchiveXarFileSetAttribute(_file, property, attr, value);
 }
 
 #pragma mark -
@@ -217,15 +209,6 @@
     sa_files = [[NSMutableArray alloc] init];
   return sa_files;
 }
-
-- (SArchiveFile *)container {
-  return sa_parent;
-}
-- (void)setContainer:(SArchiveFile *)container {
-  sa_parent = container;
-}
-
-
 
 - (NSArray *)files {
   return sa_files;
@@ -238,29 +221,19 @@
   return [[[_SArchiveFileDeepEnumerator alloc] initWithRootNode:self] autorelease];
 }
 
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id [])buffer count:(NSUInteger)len {
+  return [sa_files countByEnumeratingWithState:state objects:buffer count:len];
+}
+
 #pragma mark -
 #pragma mark Xar Interface
 
-- (id)initWithArchive:(xar_t)arch file:(xar_file_t)ptr {
+- (instancetype)initWithArchive:(xar_t)arch file:(xar_file_t)ptr {
   if (self = [super init]) {
-    [self setFile:ptr];
-    [self setArchive:arch];
+    _archive = arch;
+    _file = ptr;
   }
   return self;
-}
-
-- (xar_file_t)file {
-  return sa_file;
-}
-- (void)setFile:(xar_file_t)file {
-  sa_ptr = (void *)file;
-}
-
-- (xar_t)archive {
-  return sa_xar;
-}
-- (void)setArchive:(xar_t)arch {
-  sa_arch = (void *)arch;
 }
 
 - (void)addFile:(SArchiveFile *)aFile {
@@ -299,7 +272,7 @@
 #pragma mark -
 @implementation _SArchiveFileDeepEnumerator
 
-- (id)initWithRootNode:(SArchiveFile *)node {
+- (instancetype)initWithRootNode:(SArchiveFile *)node {
   if (self = [super init]) {
     if ([node count] > 0) {
       sa_root = [node retain];
@@ -316,12 +289,12 @@
 
 SARCHIVE_INLINE
 SArchiveFile *__WBNextFile(SArchiveFile *file) {
-  SArchiveFile *parent = [file container];
+  SArchiveFile *parent = file.container;
   if (parent) {
-    NSArray *files = [parent files];
+    NSArray *files = parent.files;
     NSUInteger idx = [files indexOfObjectIdenticalTo:file];
-    if (idx != NSNotFound && (idx + 1) < [files count])
-      return [files objectAtIndex:idx + 1];
+    if (idx != NSNotFound && (idx + 1) < files.count)
+      return files[idx + 1];
   }
   return nil;
 }
@@ -334,22 +307,24 @@ SArchiveFile *__WBNextFile(SArchiveFile *file) {
     sa_root = nil;
   }
   /* Go one level deeper */
-  if ([sa_node count] == 0) {
+  if (sa_node.count == 0) {
     /* Si on ne peut pas descendre on se deplace lateralement */
     SArchiveFile *sibling = nil;
     /* Tant qu'on est pas remonte en haut de l'arbre, et qu'on a pas trouvé de voisin */
     while (sa_node && sa_node != sa_root && !(sibling = __WBNextFile(sa_node))) {
-      sa_node = [sa_node container];
+      sa_node = sa_node.container;
     }
     sa_node = sibling;
   } else {
+    // down one level
     sa_node = [sa_node fileAtIndex:0];
   }
   return node;
 }
 
 - (NSArray *)allObjects {
-  if (!sa_node) { return [NSArray array]; }
+  if (!sa_node)
+    return [NSArray array];
   
   NSMutableArray *children = [NSMutableArray array];
   SArchiveFile *node = nil;

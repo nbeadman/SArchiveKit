@@ -10,17 +10,20 @@
 
 #import "SArchiveXar.h"
 
-NSString * const kSArchiveSignatureSHA1WithRSA = @"SHA1withRSA";
+NSString * const kSArchiveSignatureSHA1WithRSA = @"RSA"; // Must Match Apple defined type.
 
 static
 OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, const CSSM_DATA *signature, Boolean *valid);
 static
 OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, const CSSM_DATA *digest, CSSM_DATA *signature);
 
-@implementation SArchiveSignature {
-@private
-  void *sa_ptr;
-  void *sa_arch;
+@implementation SArchiveSignature
+
+- (instancetype)initWithSignature:(xar_signature_t)ptr {
+  if (self = [super init]) {
+    _signature = ptr;
+  }
+  return self;
 }
 
 - (void)dealloc {
@@ -30,20 +33,20 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
 }
 
 - (NSString *)type {
-  return sa_ptr ? [NSString stringWithUTF8String:xar_signature_type(sa_sign)] : nil;
+  return _signature ? [NSString stringWithUTF8String:xar_signature_type(_signature)] : nil;
 }
 
 - (NSArray *)certificates {
-  if (!sa_ptr) return nil;
+  if (!_signature) return nil;
   
-  uint32_t count = xar_signature_get_x509certificate_count(sa_sign);
+  uint32_t count = xar_signature_get_x509certificate_count(_signature);
   if (!count) return [NSArray array];
   
   NSMutableArray *certs = [[NSMutableArray alloc] initWithCapacity:count];
   for (uint32 idx = 0; idx < count; idx++) {
     uint32_t datalen = 0;
     const uint8_t *data = NULL;
-    if (0 == xar_signature_get_x509certificate_data(sa_sign, idx, &data, &datalen)) {
+    if (0 == xar_signature_get_x509certificate_data(_signature, idx, &data, &datalen)) {
       spx::unique_cfptr<CFDataRef> certdata(CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, data, datalen, kCFAllocatorNull));
       if (certdata) {
         spx::unique_cfptr<SecCertificateRef> cert(SecCertificateCreateWithData(kCFAllocatorDefault, certdata.get()));
@@ -56,12 +59,12 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
 }
 
 - (BOOL)addCertificate:(SecCertificateRef)cert {
-  if (!sa_ptr)
+  if (!_signature)
     return NO;
   
   spx::unique_cfptr<CFDataRef> certdata(SecCertificateCopyData(cert));
   if (certdata) {
-    return 0 == xar_signature_add_x509certificate(sa_sign, CFDataGetBytePtr(certdata.get()), (uint32_t)CFDataGetLength(certdata.get()));
+    return 0 == xar_signature_add_x509certificate(_signature, CFDataGetBytePtr(certdata.get()), (uint32_t)CFDataGetLength(certdata.get()));
   } else {
     return NO;
   }
@@ -85,11 +88,11 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
 }
 
 - (OSStatus)getDigest:(NSData **)digest signature:(NSData **)signdata {
-  if (!sa_ptr) return noErr;
+  if (!_signature) return noErr;
   
   uint8_t *data = NULL, *signed_data = NULL;
   uint32_t length = 0, signed_length = 0;
-  int err = xar_signature_copy_signed_data(sa_sign, &data, &length, &signed_data, &signed_length, NULL);
+  int err = xar_signature_copy_signed_data(_signature, &data, &length, &signed_data, &signed_length, NULL);
   if (0 == err) {
     if (digest) *digest = [NSData dataWithBytesNoCopy:data length:length freeWhenDone:YES];
     if (signdata) *signdata = [NSData dataWithBytesNoCopy:signed_data length:signed_length freeWhenDone:YES];
@@ -119,28 +122,6 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
     }
   }
   return [signature autorelease];
-}
-
-- (id)initWithArchive:(xar_t)arch signature:(xar_signature_t)ptr {
-  if (self = [super init]) {
-    [self setArchive:arch];
-    [self setSignature:ptr];
-  }
-  return self;
-}
-
-- (xar_signature_t)signature {
-  return sa_sign;
-}
-- (void)setSignature:(xar_signature_t)signature {
-  sa_ptr = (void *)signature;
-}
-
-- (xar_t)archive {
-  return sa_xar;
-}
-- (void)setArchive:(xar_t)arch {
-  sa_arch = (void *)arch;
 }
 
 @end

@@ -5,9 +5,7 @@
  *  Created by Jean-Daniel Dupas.
  *  Copyright (c) 2008 Jean-Daniel Dupas. All rights reserved.
  */
-/*! \file SArchive.h
- 
- */
+
 #include <Security/Security.h>
 #import <SArchiveKit/SABase.h>
 
@@ -21,86 +19,76 @@ SARCHIVE_EXPORT NSString * const SArchiveOptionOwnershipNumeric;
 /* Save setuid/setgid bits */
 SARCHIVE_EXPORT NSString * const SArchiveOptionSaveSUID;
 
+SARCHIVE_EXPORT NSString * const SArchiveOptionValueTrue;
+SARCHIVE_EXPORT NSString * const SArchiveOptionValueFalse;
+
 /* set the toc checksum algorithm */
 SARCHIVE_EXPORT NSString * const SArchiveOptionTocCheckSumKey;
 /* set the file checksum algorithm */
 SARCHIVE_EXPORT NSString * const SArchiveOptionFileCheckSumKey;
 
 SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSumNone;
-SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSHA1;
-SARCHIVE_EXPORT NSString * const SArchiveOptionCheckMD5;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSumSHA1;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSumSHA256;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSumSHA512;
+SARCHIVE_EXPORT NSString * const SArchiveOptionCheckSumMD5;
 
 /* set the file compression type */
 SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionKey;
 
-SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionGZip;
-SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionBZip;
-SARCHIVE_EXPORT NSString * const SArchiveOptionCompressionLZMA;
+SARCHIVE_EXPORT NSString * const SArchiveOptionValueGZip;
+SARCHIVE_EXPORT NSString * const SArchiveOptionValueBZip;
+SARCHIVE_EXPORT NSString * const SArchiveOptionValueLZMA;
 
 SARCHIVE_EXPORT NSString * const SArchiveOptionIncludedProperty;
 SARCHIVE_EXPORT NSString * const SArchiveOptionExcludedProperty;
 
+/* Read io buffer size */
+SARCHIVE_EXPORT NSString * const SArchiveOptionReadBufferSize;
+
+/* Coalesce identical heap blocks */
+SARCHIVE_EXPORT NSString * const SArchiveOptionCoalesce;
+/* Hardlink identical files */
+SARCHIVE_EXPORT NSString * const SArchiveOptionLinkSame;
+
 @class SArchiveSignature;
+@protocol SArchiveHandler;
 @class SArchiveFile, SArchiveDocument;
+
 SARCHIVE_OBJC_EXPORT
-@interface SArchive : NSObject <NSFastEnumeration> {
-@private
-  void *sa_arch; // xar_t
-  NSString *sa_path;
-  NSMapTable *sa_files;
-  NSMutableArray *sa_roots;
-  NSMutableArray *sa_signatures;
-  NSMutableDictionary *sa_documents;
-  
-  /* extract context */
-  id sa_delegate;
-  int32_t sa_extract; /* atomic lock */
-  struct _sa_arFlags {
-    unsigned int ok:1;
-    // volatile to prevent aggressive optimization.
-    volatile unsigned int cancel:1;
-    unsigned int reserved:30;
-  } sa_arFlags;
-}
+@interface SArchive : NSObject <NSFastEnumeration>
 
-- (id)initWithArchiveAtPath:(NSString *)path;
-- (id)initWithArchiveAtPath:(NSString *)path write:(BOOL)write;
+- (instancetype)initWithURL:(NSURL *)anURL;
+- (instancetype)initWithURL:(NSURL *)anURL writable:(BOOL)flag;
 
-- (id)initWithArchiveAtURL:(NSURL *)anURL;
-- (id)initWithArchiveAtURL:(NSURL *)anURL write:(BOOL)write;
-
-- (NSString *)path;
+@property(nonatomic, readonly) NSURL *URL;
 
 - (void)close;
 
 /* size after extraction */
-- (UInt64)size;
-- (NSUInteger)fileCount;
+@property(nonatomic, readonly) uint64_t size;
+@property(nonatomic, readonly) NSUInteger fileCount;
 
 /*!
- @method
- @discussion Files are not sorted in any way. 
- 						You should use Obj-C 2 "fast enumeration" instead of this when possible.
+ @discussion deep enumerator
  */
 - (NSEnumerator *)fileEnumerator;
 
-/* Returns root files */
-- (NSArray *)files;
-- (SArchiveFile *)fileWithName:(NSString *)name;
+@property(nonatomic, readonly) NSArray *rootFiles;
 
-- (void)includeProperty:(NSString *)name;
-- (void)excludeProperty:(NSString *)name;
+- (SArchiveFile *)fileWithName:(NSString *)name;
 
 - (NSString *)valueForOption:(NSString *)key;
 - (void)setValue:(NSString *)opt forOption:(NSString *)key;
+
 - (BOOL)boolValueForOption:(NSString *)key;
 - (void)setBoolValue:(BOOL)value forOption:(NSString *)key;
 
-- (SArchiveFile *)addFile:(NSString *)path;
-- (SArchiveFile *)addFile:(NSString *)path name:(NSString *)name parent:(SArchiveFile *)parent;
+- (SArchiveFile *)addFileAtURL:(NSURL *)url;
+- (SArchiveFile *)addFileAtURL:(NSURL *)url name:(NSString *)name parent:(SArchiveFile *)parent;
 
-- (SArchiveFile *)addFile:(NSString *)name data:(NSData *)data parent:(SArchiveFile *)parent;
-- (SArchiveFile *)addFolder:(NSString *)name properties:(NSDictionary *)props parent:(SArchiveFile *)parent;
+- (SArchiveFile *)addFileWithName:(NSString *)name content:(NSData *)data parent:(SArchiveFile *)parent;
+- (SArchiveFile *)addFolderWithName:(NSString *)name properties:(NSDictionary *)props parent:(SArchiveFile *)parent;
 
 - (SArchiveFile *)addFileWrapper:(NSFileWrapper *)aWrapper parent:(SArchiveFile *)parent;
 
@@ -109,7 +97,8 @@ SARCHIVE_OBJC_EXPORT
 - (SArchiveDocument *)addDocumentWithName:(NSString *)name;
 
 #pragma mark Signatures
-- (NSArray *)signatures;
+@property(nonatomic, readonly) NSArray *signatures;
+
 - (SArchiveSignature *)addSignature:(SecIdentityRef)identity;
 - (SArchiveSignature *)addSignature:(SecIdentityRef)identity includeCertificate:(BOOL)include;
 
@@ -120,7 +109,7 @@ SARCHIVE_OBJC_EXPORT
  <code>- (BOOL)archive:(SArchive *)manager shouldProceedAfterError:(NSError *)anError severity:(SArchiveErrorLevel)severity</code>.
  keys: @"ArchiveFile".
  */
-- (BOOL)extractToPath:(NSString *)path handler:(id)handler;
+- (BOOL)extractAtURL:(NSURL *)anURL handler:(id<SArchiveHandler>)handler;
 
 /* cancel background extraction */
 - (void)cancel;
@@ -129,7 +118,7 @@ SARCHIVE_OBJC_EXPORT
 
 SARCHIVE_EXPORT NSString * const SArchiveErrorDomain;
 
-enum {
+typedef NS_ENUM(NSInteger, SArchiveErrorLevel) {
 	kSArchiveLevelDebug    = 1,
 	kSArchiveLevelInfo     = 2,
 	kSArchiveLevelNormal   = 3,
@@ -137,19 +126,19 @@ enum {
 	kSArchiveLevelNonFatal = 5,
 	kSArchiveLevelFatal    = 6,
 };
-typedef NSInteger SArchiveErrorLevel;
 
 /* Extraction */
-@interface NSObject (SArchiveHandler)
+@protocol SArchiveHandler <NSObject>
+@optional
+- (BOOL)archive:(SArchive *)archive shouldProcessFile:(SArchiveFile *)file;
+- (void)archive:(SArchive *)archive willProcessFile:(SArchiveFile *)file;
+//- (void)archive:(SArchive *)archive extractingFile:(SArchiveFile *)file progress:(CGFloat)progress;
 
-- (BOOL)archive:(SArchive *)manager shouldProcessFile:(SArchiveFile *)file;
-- (void)archive:(SArchive *)manager willProcessFile:(SArchiveFile *)file;
-//- (void)archive:(SArchive *)manager extractingFile:(SArchiveFile *)file progress:(CGFloat)progress;
-- (void)archive:(SArchive *)manager didProcessFile:(SArchiveFile *)file path:(NSString *)filePath;
+- (void)archive:(SArchive *)archive didExtractFile:(SArchiveFile *)file atURL:(NSURL *)url;
 
-- (void)archive:(SArchive *)manager didExtract:(BOOL)result path:(NSString *)path;
+- (void)archive:(SArchive *)archive didExtractContent:(BOOL)result atURL:(NSURL *)url;
 
-- (BOOL)archive:(SArchive *)manager shouldProceedAfterError:(NSError *)anError severity:(SArchiveErrorLevel)severity;
+- (BOOL)archive:(SArchive *)archive shouldProceedAfterError:(NSError *)anError severity:(SArchiveErrorLevel)severity;
 
 @end
 

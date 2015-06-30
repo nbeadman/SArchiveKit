@@ -13,9 +13,56 @@
 NSString * const kSArchiveSignatureSHA1WithRSA = @"RSA"; // Must Match Apple defined type.
 
 static
-OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, const CSSM_DATA *signature, Boolean *valid);
+bool WBSecTransformSetDigest(SecTransformRef trans, CFTypeRef digestAlg, CFIndex digestBitLength, CFErrorRef *error) {
+  if (digestAlg) {
+    if (!SecTransformSetAttribute(trans, kSecDigestTypeAttribute, digestAlg, error))
+      return false;
+
+    if (digestBitLength > 0) {
+      spx::unique_cfptr<CFNumberRef> length(CFNumberCreate(kCFAllocatorDefault, kCFNumberCFIndexType, &digestBitLength));
+      if (!SecTransformSetAttribute(trans, kSecDigestLengthAttribute, length.get(), error))
+        return false;
+    }
+  }
+
+  return true;
+}
+
 static
-OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, const CSSM_DATA *digest, CSSM_DATA *signature);
+SecTransformRef WBSecVerifyTransformCreate(SecKeyRef pkey, CFDataRef signature, CFTypeRef digestAlg, CFIndex digestBitLength, CFErrorRef *error) {
+  spx::unique_cfptr<SecTransformRef> trans(SecVerifyTransformCreate(pkey, signature, error));
+  if (trans && !WBSecTransformSetDigest(trans.get(), digestAlg, digestBitLength, error))
+    return nullptr;
+  return trans.release();
+}
+
+static
+CFBooleanRef WBSecurityVerifyDigestSignature(CFDataRef data, CFDataRef signature, SecKeyRef pubKey, CFTypeRef digestAlg, CFIndex digestBitLength, CFErrorRef *error) {
+  spx::unique_cfptr<SecTransformRef> trans(WBSecVerifyTransformCreate(pubKey, signature, digestAlg, digestBitLength, error));
+  if (trans &&
+      SecTransformSetAttribute(trans.get(), kSecInputIsAttributeName, kSecInputIsDigest, error) &&
+      SecTransformSetAttribute(trans.get(), kSecTransformInputAttributeName, data, error))
+    return static_cast<CFBooleanRef>(SecTransformExecute(trans.get(), error));
+  return nullptr;
+}
+
+static
+SecTransformRef WBSecSignTransformCreate(SecKeyRef pkey, CFTypeRef digestAlg, CFIndex digestBitLength, CFErrorRef *error) {
+  spx::unique_cfptr<SecTransformRef> trans(SecSignTransformCreate(pkey, error));
+  if (trans && !WBSecTransformSetDigest(trans.get(), digestAlg, digestBitLength, error))
+    return nullptr;
+  return trans.release();
+}
+
+static
+CFDataRef WBSecuritySignDigest(CFDataRef digest, SecKeyRef pkey, CFTypeRef digestAlg, CFIndex digestBitLength, CFErrorRef *error) {
+  spx::unique_cfptr<SecTransformRef> sign(WBSecSignTransformCreate(pkey, digestAlg, digestBitLength, error));
+  if (sign &&
+      SecTransformSetAttribute(sign.get(), kSecInputIsAttributeName, kSecInputIsDigest, error) &&
+      SecTransformSetAttribute(sign.get(), kSecTransformInputAttributeName, digest, error))
+    return static_cast<CFDataRef>(SecTransformExecute(sign.get(), error));
+  return nullptr;
+}
 
 @implementation SArchiveSignature
 
@@ -72,19 +119,17 @@ OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, co
 
 - (BOOL)verify:(SecCertificateRef)certificate {
   SecKeyRef pkey = NULL;
-  Boolean valid = false;
+  CFBooleanRef valid = nullptr;
   NSData *data = NULL, *signature = NULL;
   OSStatus err = SecCertificateCopyPublicKey(certificate, &pkey);
   if (noErr == err)
     err = [self getDigest:&data signature:&signature];
   if (noErr == err) {
-    const CSSM_DATA cdata = { [data length], (UInt8 *)[data bytes] };
-    const CSSM_DATA csign = { [signature length], (UInt8 *)[signature bytes] };
-    err = WBSecurityVerifySignature(pkey, &cdata, &csign, &valid);
+    valid = WBSecurityVerifyDigestSignature(SPXNSToCFData(data), SPXNSToCFData(signature), pkey, kSecDigestSHA1, 0, NULL);
   }
   if (pkey) CFRelease(pkey);
   
-  return valid;
+  return valid != nullptr && CFBooleanGetValue(valid);
 }
 
 - (OSStatus)getDigest:(NSData **)digest signature:(NSData **)signdata {
@@ -111,13 +156,14 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
   SArchiveSignature *signature = nil;
   OSStatus err = SecIdentityCopyPrivateKey(identity, &pkey);
   if (noErr == err) {
+    // FIXME: works only for RSA
     signlen = SecKeyGetBlockSize(pkey);
     CFRelease(pkey);
   }
   if (signlen > 0) {
     xar_signature_t sign = xar_signature_new(arch, [kSArchiveSignatureSHA1WithRSA UTF8String], signlen, _SArchiveSigner, identity);
     if (sign) {
-      signature = [[SArchiveSignature alloc] initWithArchive:arch signature:sign];
+      signature = [[SArchiveSignature alloc] initWithSignature:sign];
       signature->_identity = SPXCFRetain(identity);
     }
   }
@@ -129,111 +175,21 @@ int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint3
 #pragma mark -
 #pragma mark Signature
 int32_t _SArchiveSigner(xar_signature_t sig, void *context, uint8_t *data, uint32_t length, uint8_t **signed_data, uint32_t *signed_len) {
-  SecKeyRef pkey = NULL;
-  size_t signlen = 0;
+  SecKeyRef pkey = nullptr;
   SecIdentityRef ident = (SecIdentityRef)context;
   OSStatus err = SecIdentityCopyPrivateKey(ident, &pkey);
-  if (noErr == err)
-    signlen = SecKeyGetBlockSize(pkey);
-  if (signlen > 0) {
-    CSSM_DATA digest = { length, data };
-    CSSM_DATA signature = { signlen, static_cast<uint8_t *>(malloc(signlen)) };
-    err = WBSecuritySignData(pkey, kSecCredentialTypeDefault, &digest, &signature);
-    if (noErr == err) {
-      *signed_len = (uint32_t)signature.Length;
-      *signed_data = signature.Data;
+  if (noErr == err) {
+    spx::unique_cfptr<CFDataRef> digest(CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, data, length, kCFAllocatorNull));
+    CFDataRef signature = WBSecuritySignDigest(digest.get(), pkey, kSecDigestSHA1, length, nullptr);
+    if (signature) {
+      *signed_len = (uint32_t)CFDataGetLength(signature);
+      *signed_data = static_cast<uint8_t *>(malloc(*signed_len));
+      CFDataGetBytes(signature, CFRangeMake(0, *signed_len), *signed_data);
+      CFRelease(signature);
+    } else {
+      err = -1;
     }
+    SPXCFRelease(pkey);
   }
-  SPXCFRelease(pkey);
-  
-  return err;
-}
-
-#pragma mark -
-#pragma mark CSSM Functions
-// Copied from WonderBox
-#pragma mark Sign
-static
-OSStatus WBSecurityCreateSignatureContext(SecKeyRef privKey, SecCredentialType credentials, CSSM_CC_HANDLE *ccHandle) {
-  OSStatus err = noErr;
-  CSSM_CSP_HANDLE cspHandle = 0;
-  const CSSM_KEY *privkey = NULL;
-  const CSSM_ACCESS_CREDENTIALS *credits = NULL;
-  
-  /* retreive cssm objects */
-  err = SecKeyGetCSSMKey(privKey, &privkey);
-  require_noerr(err, bail);
-  err = SecKeyGetCSPHandle(privKey, &cspHandle);
-  require_noerr(err, bail);
-  err = SecKeyGetCredentials(privKey, CSSM_ACL_AUTHORIZATION_SIGN, credentials, &credits);
-  require_noerr(err, bail);
-  
-  /* create cssm context */
-  err = CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_RSA, credits, privkey, ccHandle);
-  require_noerr(err, bail);
-  
-bail:
-  return err;
-}
-static
-OSStatus WBSecuritySignData(SecKeyRef privKey, SecCredentialType credentials, const CSSM_DATA *digest, CSSM_DATA *signature) {
-  OSStatus err = noErr;
-  CSSM_CC_HANDLE ccHandle = 0;
-  
-  err = WBSecurityCreateSignatureContext(privKey, credentials, &ccHandle);
-  require_noerr(err, bail);
-  err = CSSM_SignData(ccHandle, digest, 1, CSSM_ALGID_SHA1, signature);
-  require_noerr(err, bail);
-  
-bail:
-  /* cleanup */
-  if (ccHandle) CSSM_DeleteContext(ccHandle);
-  
-  return err;
-}
-
-#pragma mark Verify
-static
-OSStatus WBSecurityCreateVerifyContext(SecKeyRef pubKey, CSSM_CC_HANDLE *ccHandle) {
-  OSStatus err = noErr;
-  CSSM_CSP_HANDLE cspHandle = 0;
-  const CSSM_KEY *pubkey = NULL;
-  
-  /* retreive pubkey and csp */
-  err = SecKeyGetCSSMKey(pubKey, &pubkey);
-  require_noerr(err, bail);
-  err = SecKeyGetCSPHandle(pubKey, &cspHandle);
-  require_noerr(err, bail);
-  
-  /* create cssm context */
-  err = CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_RSA, NULL, pubkey, ccHandle);
-  require_noerr(err, bail);
-  
-bail:
-  return err;
-}
-static
-OSStatus WBSecurityVerifySignature(SecKeyRef pubKey, const CSSM_DATA *digest, const CSSM_DATA *signature, Boolean *valid) {
-  OSStatus err = noErr;
-  CSSM_CC_HANDLE ccHandle = 0;
-  
-  /* retreive pubkey and csp */
-  err = WBSecurityCreateVerifyContext(pubKey, &ccHandle);
-  require_noerr(err, bail);
-  
-  /* verify data */
-  err = CSSM_VerifyData(ccHandle, digest, 1, CSSM_ALGID_SHA1, signature);
-  if (CSSMERR_CSP_VERIFY_FAILED == err) {
-    err = noErr;
-    *valid = FALSE;
-  } else if (noErr == err) {
-    *valid = TRUE;
-  }
-  require_noerr(err, bail);
-  
-bail:
-  /* cleanup */
-  if (ccHandle) CSSM_DeleteContext(ccHandle);
-  
   return err;
 }

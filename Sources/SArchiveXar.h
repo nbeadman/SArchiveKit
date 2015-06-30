@@ -54,7 +54,12 @@ const char *SArchiveGetPath(NSURL *url, bool resolve) {
     url = url.filePathURL;
   if (NSFoundationVersionNumber >= NSFoundationVersionNumber10_9)
     return url.fileSystemRepresentation;
-  return url.path.fileSystemRepresentation;
+  @try {
+    return url.path.fileSystemRepresentation;
+  } @catch(NSException *e) {
+    SPXLogException(e);
+  }
+  return NULL;
 }
 
 @interface SArchiveFile ()

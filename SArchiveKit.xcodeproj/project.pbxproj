@@ -63,7 +63,6 @@
 		1BE2F1A21036031000B63833 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A11036031000B63833 /* libz.dylib */; };
 		1BE2F1A71036032B00B63833 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A61036032B00B63833 /* libxml2.dylib */; };
 		1BE2F1A91036033200B63833 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1A81036033200B63833 /* libbz2.dylib */; };
-		1BE2F1AC1036033E00B63833 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE2F1AB1036033E00B63833 /* libcrypto.dylib */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		98F6813E0CBECAE700813672 /* SArchiveSignature.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98F6813C0CBECAE700813672 /* SArchiveSignature.mm */; };
 		98F6834D0CBEE67F00813672 /* SArchiveSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F683430CBEE67E00813672 /* SArchiveSignature.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -155,7 +154,6 @@
 		1BE2F1A11036031000B63833 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		1BE2F1A61036032B00B63833 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		1BE2F1A81036033200B63833 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
-		1BE2F1AB1036033E00B63833 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* SArchiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SArchiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F6813C0CBECAE700813672 /* SArchiveSignature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = SArchiveSignature.mm; sourceTree = "<group>"; };
@@ -188,7 +186,6 @@
 				1BE2F1A21036031000B63833 /* libz.dylib in Frameworks */,
 				1BE2F1A71036032B00B63833 /* libxml2.dylib in Frameworks */,
 				1BE2F1A91036033200B63833 /* libbz2.dylib in Frameworks */,
-				1BE2F1AC1036033E00B63833 /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,7 +220,6 @@
 				1BE2F1A11036031000B63833 /* libz.dylib */,
 				1BE2F1A81036033200B63833 /* libbz2.dylib */,
 				1BE2F1A61036032B00B63833 /* libxml2.dylib */,
-				1BE2F1AB1036033E00B63833 /* libcrypto.dylib */,
 				1B35ED2813C0B82E00A8AEA6 /* Cocoa.framework */,
 				1B35ED2A13C0B83500A8AEA6 /* Security.framework */,
 			);
@@ -451,7 +447,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0640;
+				LastUpgradeCheck = 0800;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "SArchiveKit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -597,6 +593,7 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
+				PRODUCT_BUNDLE_IDENTIFIER = org.shadowlab.sarchivekit;
 				PRODUCT_NAME = SArchiveKit;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -613,6 +610,7 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
+				PRODUCT_BUNDLE_IDENTIFIER = org.shadowlab.sarchivekit;
 				PRODUCT_NAME = SArchiveKit;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -622,6 +620,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1B5A2BB00ED07A0F0036568B /* debug.xcconfig */;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;

@@ -1,6 +1,6 @@
 [submodule "xar"]
 	path = xar
-	url = ../xar
+	url = https://github.com/Jean-Daniel/xar
 	branch = master
 [submodule "hadron"]
 	path = hadron
